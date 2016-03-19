@@ -3,6 +3,7 @@ IR Lego Power Function for train, switch control with servo motor, light signal.
 
 This project allow to control any Lego Power Function and support all Lego modes including exclusive modes which can't be done thru any of the Lego remote control. 
 A specific module allow to control servo motors used to pilot Lego switches. Another module allow to pilot red/green signal lights.
+Check [this video](https://onedrive.live.com/redir?resid=ED3080C73007CBED!161097&authkey=!AG2N5T7Qx6PtG3A&ithint=video%2cMP4) to see in action the project in a real Lego city!
 
 ## Infrared
 The infrared module require a bit of electronic. You'll need a to drive enough power in the infrared led to be able to control trains or other Lego Power Functions in large rooms or with a lot of lights.
