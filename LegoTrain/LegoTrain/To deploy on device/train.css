@@ -1,0 +1,55 @@
+@charset "utf-8";
+/* CSS Document */
+
+body {
+	font-family: "Lucida Console", Monaco, monospace;
+	font-size: 16px;
+	color: #09C;
+
+}
+
+a {
+	font-family: "Lucida Console", Monaco, monospace;
+	font-size: 14px;
+	color: #09F;
+}
+td {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #004262;
+	font-size: 14px;
+}
+input {
+	font-family: "Lucida Console", Monaco, monospace;
+	font-size: 16px;
+	color: #09F;
+	background-color: #FFF;
+	-webkit-transition: all 0s linear 0s;
+	-moz-transition: all 0s linear 0s;
+	-ms-transition: all 0s linear 0s;
+	-o-transition: all 0s linear 0s;
+	transition: all 0s linear 0s;
+	border: 1px none #FFF;
+}
+
+h1 {
+	font-family: Arial, Helvetica, sans-serif;
+	color: #FFF;
+	background-color: #006699;
+	font-size: 24px;
+	border: thick solid #006699;
+}
+td {
+	font-family: Arial, Helvetica, sans-serif;
+	text-align: left;
+	font-size: 16px;
+}
+footer {
+	color: #09C;
+}
+input:hover {
+	background-color: #09F;
+	color: #FFF;
+}
+input:active {
+	background-color: #003;
+}

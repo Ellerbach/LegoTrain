@@ -89,6 +89,9 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
+    <None Include="Docs\Creating setup file.xlsx" />
+    <None Include="Docs\Creating the circuit file.pptx" />
+    <None Include="Docs\Lego Infrared documentation.docx" />
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +126,11 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="To deploy on device\circuit.png" />
+    <Content Include="To deploy on device\ParamTrain.txt" />
+    <Content Include="To deploy on device\str.png" />
+    <Content Include="To deploy on device\train.css" />
+    <Content Include="To deploy on device\turn.png" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
