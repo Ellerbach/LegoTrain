@@ -13,7 +13,7 @@ The MOSI pin is 19 and Enabled is pin number 24 on the Rpi2. Those are the 2 pin
 
 ## Switches
 Piloting switches require as well specific electronic. In this case multiplexing. Schema is quite simple for this:
-[Electronic for switches](/http://www.nxp.com/documents/data_sheet/74HC_HCT4515_CNV.pdf)
+[schema of the 74HC4515](/http://www.nxp.com/documents/data_sheet/74HC_HCT4515_CNV.pdf)
 * A0 -> GPIO16 (pin 36)
 * A1 -> GPIO20 (pin 38)
 * A2 -> GPIO21 (pin 40)
@@ -53,3 +53,6 @@ Once deployed on the Raspberry, you can make your project default project and it
 Access it like http://IPaddress/circ.aspx?sec=Key234
 If all is correct, you should see a page like that:
 ![Train](/Assets/train.jpg)
+
+## Using the API
+API are available. Documentation in [this Word file](/Docs/Lego%20Infrared%20documentation.docx) (to be migrated to md file). This does allow to pilot any Lego IR element, more than just trains. A test fuction for all the elements is available using the page which displays all the elements.
