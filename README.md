@@ -48,6 +48,12 @@ You can create your own circuit picture using for [example PowerPoint](/Docs/Cre
 Please note you can change all the train names, switches names as well. So far only use Ascii 7 codes, so accent and other non core Ascii caracters.
 The security key is required, you can leave it empty if you don't want any but need to add it to the URL in all cases like ?sec=
 
+## Loading the project and referencing other projects
+When loading the LegoTrain.sln solution, you'll need as well the following projects:
+* [RPI-Win10-Helpers](https://github.com/Ellerbach/RPI-Win10-Helpers)
+* My own fork of the excellent [Restup webserver](https://github.com/Ellerbach/restup)
+Note: working on using only the master of the Restup project. This will be done later on.
+
 ## Running the project
 Once deployed on the Raspberry, you can make your project default project and it will be launched at boot time.
 Access it like http://IPaddress/circ.aspx?sec=Key234
