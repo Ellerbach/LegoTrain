@@ -61,4 +61,4 @@ If all is correct, you should see a page like that:
 ![Train](/Assets/train.jpg)
 
 ## Using the API
-API are available. Documentation in [this Word file](/Docs/Lego%20Infrared%20documentation.docx) (to be migrated to md file). This does allow to pilot any Lego IR element, more than just trains. A test fuction for all the elements is available using the page which displays all the elements.
+API are available. Documentation in [this file](/Docs/Lego%20Infrared%20API%20doc.md). This does allow to pilot any Lego IR element, more than just trains. A test fuction for all the elements is available using the page which displays all the elements.
