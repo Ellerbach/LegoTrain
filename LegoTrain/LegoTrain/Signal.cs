@@ -27,7 +27,7 @@ namespace LegoTrain
         private byte mNumberSignal;
         private bool[] mSignalStatus;
         private const byte nUMBER_SIGNAL_MAX = 16;
-        private const Int32 SPI_CHIP_SELECT_LINE = 0;       /* Line 0 maps to physical pin number 24 on the Rpi2        */
+        private const Int32 SPI_CHIP_SELECT_LINE = 1;       /* Line 0 maps to physical pin number 24 on the Rpi2        */
 
         private SpiDevice MySignal;
 
