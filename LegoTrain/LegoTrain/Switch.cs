@@ -25,7 +25,7 @@ namespace LegoTrain
     {
         private byte mNumberSwitch;
         private bool[] mSwitchStatus;
-        private const byte nUMBER_SWITCH_MAX = 8;
+        private const byte nUMBER_SWITCH_MAX = 16;
         private int numOutput = 3;
         private uint mMinAngle;
         private uint mMaxAngle;
@@ -34,14 +34,14 @@ namespace LegoTrain
         // Rotational Range: 203° 
         // Pulse Cycle: 20 ms 
         // Pulse Width: 540-2470 µs 
-        private ServoMotor mSwitch; // = new ServoMotor(Pins.GPIO_PIN_D5, new ServoMotorDefinition(540, 2470));
-        //private SecretLabs.NETMF.Hardware.PWM mSwitch = new SecretLabs.NETMF.Hardware.PWM(Pins.GPIO_PIN_D5);
+        private ServoMotor mSwitch; 
         private const int GPIO_PIN_D6 = 16;
         private const int GPIO_PIN_D7 = 20;
         private const int GPIO_PIN_D8 = 21;
+        private const int GPIO_PIN_D9 = 19;
         private const int GPIO_PIN_D5 = 13;
-        private int[] mPinTable = new int[3] { GPIO_PIN_D6, 
-            GPIO_PIN_D7, GPIO_PIN_D8 };
+        private int[] mPinTable = new int[4] { GPIO_PIN_D6, 
+            GPIO_PIN_D7, GPIO_PIN_D8, GPIO_PIN_D9 };
 
         public Switch(byte NumberSwitch, uint MinDur, uint MaxDur, uint MinAng, uint MaxAng, uint ServoAngle)
         {
@@ -58,6 +58,8 @@ namespace LegoTrain
                 numOutput = 2;
             else if (mNumberSwitch <= 8)
                 numOutput = 3;
+            else if (mNumberSwitch <= 16)
+                numOutput = 4;
             else
                 new Exception("Too many Signals");
             //initialise the outputs based on the number of signals
@@ -68,8 +70,9 @@ namespace LegoTrain
                 return;
             }
 
-            mOut = new GpioPin[numOutput];
-            for (int i = 0; i < numOutput; i++)
+            //initialize all multiplexer output to Low
+            mOut = new GpioPin[mPinTable.Length];
+            for (int i = 0; i < mPinTable.Length; i++)
             {
                 mOut[i] = gpio.OpenPin(mPinTable[i]);
                 mOut[i].Write(GpioPinValue.Low);
@@ -115,15 +118,11 @@ namespace LegoTrain
             Debug.WriteLine("Changing switch: {0} to value {1}", NumSignal, value);
             if (value)
             {
-                //mSwitch.Angle = 82;
                 mSwitch.Angle = mMaxAngle;
-                //mSwitch.SetPulse(20000, 1215);
             }
             else
             {
-                //mSwitch.Angle = 0
                 mSwitch.Angle = mMinAngle;
-                //mSwitch.SetPulse(20000, 540);
             }
 
         }
@@ -132,7 +131,6 @@ namespace LegoTrain
         {
             if ((NumSignal <= 0) && (NumSignal > mNumberSwitch))
                 new Exception("Not correct number of Signals");
-            // need to convert to BCD
             return mSwitchStatus[NumSignal];
         }
     }
