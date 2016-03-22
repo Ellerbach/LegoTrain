@@ -18,8 +18,9 @@ Piloting switches require as well specific electronic. In this case multiplexing
 * A0 -> GPIO16 (pin 36)
 * A1 -> GPIO20 (pin 38)
 * A2 -> GPIO21 (pin 40)
-* A3 -> Ground
-* E -> GPIO13 (pin 33)
+* A3 -> GPIO19 (pin 35)
+* E -> Ground
+* LE -> GPIO13 (pin 33)
 All output to be plugged to the driving pin of every servo motor. Servo motor to be at +5V voltage. The level of high for the 4515 is higher than the 3.3V delivered by the RPI, so no need of level converter to 5V.
 
 For the hardware part, you'll need simple servo motor, here is a basic view on how to integrate them with the Lego switch:
