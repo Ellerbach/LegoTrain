@@ -64,3 +64,5 @@ If all is correct, you should see a page like that:
 
 ## Using the API
 API are available. Documentation in [this file](/Docs/Lego%20Infrared%20API%20doc.md). This does allow to pilot any Lego IR element, more than just trains. A test fuction for all the elements is available using the page which displays all the elements.
+
+This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
