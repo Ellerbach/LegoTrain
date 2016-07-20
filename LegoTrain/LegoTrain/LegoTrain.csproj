@@ -99,8 +99,12 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\ParamSignal.cs" />
+    <Compile Include="Models\ParamSwitch.cs" />
+    <Compile Include="Models\ParamTrain.cs" />
+    <Compile Include="Models\ParamTrainRedBlue.cs" />
     <Compile Include="Param.cs" />
-    <Compile Include="ParamTrain.cs" />
+    <Compile Include="Models\ParamRail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Signal.cs" />
     <Compile Include="StringConstants.cs" />
