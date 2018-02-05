@@ -33,6 +33,7 @@ namespace LegoTrain
         private const string paramNumberSignal = "nsi";
         private const string paramNumberSwitch = "nai";
         private const string paramNameSwitch = "ain";
+        private const string paramNameSignal = "sna";
         private const string paramNumberTrain = "ntr";
         private const string paramTrainName = "tn";
         private const string paramParamChannel = "tc";
@@ -51,6 +52,8 @@ namespace LegoTrain
         private const string paramWeb = "wb";
         private const string paramtop = "pt";
         private const string paramleft = "pl";
+        private const string paramSignaltop = "spt";
+        private const string paramSignalleft = "spl";
         private const string paramSwitchMinDur = "smi";
         private const string paramSwitchMaxDur = "sma";
         private const string paramSwitchMinAng = "ami";

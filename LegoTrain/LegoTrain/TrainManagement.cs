@@ -1,6 +1,7 @@
 ﻿using Devkoes.Restup.WebServer.Attributes;
 using Devkoes.Restup.WebServer.Models.Schemas;
 using IoTCoreHelpers;
+using LegoTrain.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

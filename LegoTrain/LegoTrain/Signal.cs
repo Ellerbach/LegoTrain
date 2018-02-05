@@ -98,12 +98,12 @@ namespace LegoTrain
             ushort[] mySign = new ushort[1] { 0 };
             for (ushort i = 0; i < mNumberSignal; i++)
                 if (mSignalStatus[i])
-                    mySign[0] = (ushort)(mySign[0] | (ushort)(1 << i));
+                    mySign[0] = (ushort)(mySign[0] | (ushort)(1 << i * 2));
+                else
+                    mySign[0] = (ushort)(mySign[0] | (ushort)(1 << (i * 2 + 1)));
             //send the bytes
-            if (MySignal!= null)
+            if (MySignal != null)
                 MySignal.Write(Helpers.UshortToByte(mySign));
-            
-
         }
 
         public bool GetSignal(byte NumSignal)

@@ -1,6 +1,7 @@
 ﻿using Devkoes.Restup.WebServer.Attributes;
 using Devkoes.Restup.WebServer.Models.Schemas;
 using IoTCoreHelpers;
+using LegoTrain.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -121,7 +122,20 @@ namespace LegoTrain
                 }
 
                 if (mSignal != 255)
+                {
                     myParamRail.NumberOfSignals = mSignal;
+                    myParamRail.Signals = new ParamSignal[mSignal];
+                    for (byte a = 1; a <= mSignal; a++)
+                    {
+                        myParamRail.Signals[a - 1] = new ParamSignal();
+                        string mName = Param.CheckConvertString(Params, paramNameSignal + a.ToString());
+                        if (mName == "")
+                            mName = "Signal " + a.ToString();
+                        myParamRail.Signals[a - 1].Name = mName;
+                        myParamRail.Signals[a - 1].Left = Param.CheckConvertInt32(Params, paramSignalleft + a.ToString());
+                        myParamRail.Signals[a - 1].Top = Param.CheckConvertInt32(Params, paramSignaltop + a.ToString());
+                    }
+                }
                 if (mSwitch != 255)
                 {
                     myParamRail.NumberOfSwitchs = mSwitch;
