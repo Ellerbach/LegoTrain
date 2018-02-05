@@ -101,7 +101,7 @@ Order of the values is always from switch 0 to 7. If you've setup a maximum numb
 
 ## Serial communication protocol
 
-The serial protocol is very similar to the HTTP one. Main difference is that only the page and the arguments are send and no security key is required.
+The serial protocol is very similar to the HTTP one. Main difference is that only the page and the arguments are send. and no security key is required.
 
 So a command looks like switch.aspx?si=0&md=0\r
 
@@ -432,6 +432,62 @@ this argument indicate which PWM value the motor (or lamp) has to take, accepted
 ### ch
 
 this argument select the channel of the receptor. Accepted values goes from 0 to 3 for channel 1 to 4.
+
+## Combo PWM All Mode
+
+This mode is able to control the 8 outputs with PWM in 7 steps forward and backward at the same time!
+
+This is a combo command controlling the state of both output red and blue at the same time.
+
+This mode has timeout for lost IR.
+
+Usage: combopwmall.aspx?pwr0=4&pwb0=10&pwr1=3&pwb1=0&pwr2=5&pwb2=1&pwr3=3&pwb3=10
+
+### pwrX
+
+X = channel from 0 to 3
+this argument indicate which PWM value the motor (or lamp) has to take, accepted values are the following:
+
+- Float = 0 (0x0)
+- PWM forward step 1 = 1 (0x1)
+- PWM forward step 2 = 2 (0x2)
+- PWM forward step 3 = 3 (0x3)
+- PWM forward step 4 = 4 (0x4)
+- PWM forward step 5 = 5 (0x5)
+- PWM forward step 6 = 6 (0x6)
+- PWM forward step 7 = 7 (0x7)
+- Brake = 8 (0x8)
+- PWM backward step 7 = 9 (0x9)
+- PWM backward step 6 = 10 (0xA)
+- PWM backward step 5 = 11 (0xB)
+- PWM backward step 4 = 12 (0xC)
+- PWM backward step 3 = 13 (0xD)
+- PWM backward step 2 = 14 (0xE)
+- PWM backward step 1 = 15 (0xF)
+
+### pwbX
+
+X = channel from 0 to 3
+this argument indicate which PWM value the motor (or lamp) has to take, accepted values are the following:
+
+- Float = 0 (0x0)
+- PWM forward step 1 = 1 (0x1)
+- PWM forward step 2 = 2 (0x2)
+- PWM forward step 3 = 3 (0x3)
+- PWM forward step 4 = 4 (0x4)
+- PWM forward step 5 = 5 (0x5)
+- PWM forward step 6 = 6 (0x6)
+- PWM forward step 7 = 7 (0x7)
+- Brake = 8 (0x8)
+- PWM backward step 7 = 9 (0x9)
+- PWM backward step 6 = 10 (0xA)
+- PWM backward step 5 = 11 (0xB)
+- PWM backward step 4 = 12 (0xC)
+- PWM backward step 3 = 13 (0xD)
+- PWM backward step 2 = 14 (0xE)
+- PWM backward step 1 = 15 (0xF)
+
+Note : if any channel is missing the information sent will be Float (0x0).
 
 ### Combo Mode All
 

@@ -123,7 +123,7 @@ namespace LegoTrain
 
     public sealed class LegoInfrared
     {
-        
+
         private uint[] toggle = new uint[] { 0, 0, 0, 0 };
         // IR = 6 time 1 and 0 = 101010101010 
         // ZE = 2 time 0 = 00 = 0
@@ -172,7 +172,7 @@ namespace LegoTrain
                     Debug.WriteLine("SPI does not exist on the current system.");
                     return;
                 }
-                
+
                 //SPIConfInfrared = new SPI.Configuration(
                 //Pins.GPIO_NONE, // SS-pin
                 //true,             // SS-pin active state
@@ -275,13 +275,13 @@ namespace LegoTrain
                 }
                 //stop bit
                 i = FillStartStop(tosend, i);
-                if (DataCommandPin!=null)
+                if (DataCommandPin != null)
                     DataCommandPin.Write(GpioPinValue.High);
                 if (MySerial != null)
                     MySerial.Write(Helpers.UshortToByte(tosend));
                 else
                     Debug.WriteLine("No SPI or PC mode");
-                if(DataCommandPin!=null)
+                if (DataCommandPin != null)
                     DataCommandPin.Write(GpioPinValue.Low);
             }
             catch (Exception e)
@@ -292,7 +292,7 @@ namespace LegoTrain
             return isvalid;
         }
 
-        
+
 
         private bool sendAllMessage(ushort[] nib2, ushort[] nib3, ushort[] nib4, ushort[] nib1)
         {
@@ -441,6 +441,24 @@ namespace LegoTrain
             nib4 = 0xf ^ nib1 ^ nib2 ^ nib3;
 
             return (sendMessage((ushort)nib1, (ushort)nib2, (ushort)nib3, (ushort)nib4, (uint)channel));
+        }
+
+        public bool ComboPWMAll([ReadOnlyArray()]LegoPWM[] pwm1, [ReadOnlyArray()]LegoPWM[] pwm2)
+        {
+            //prepare all channels
+            ushort[] nib1 = new ushort[4], nib2 = new ushort[4], nib3 = new ushort[4], nib4 = new ushort[4];
+
+            //set nibs
+            for (int i = 0; i < 4; i++)
+            {
+                //set nibs
+                nib1[i] = (ushort)(1 << 2 | (uint)i);
+                nib2[i] = (ushort)pwm1[i];
+                nib3[i] = (ushort)pwm2[i];
+                nib4[i] = (ushort)(0xf ^ nib1[i] ^ nib2[i] ^ nib3[i]);
+            }
+
+            return (sendAllMessage(nib1, nib2, nib3, nib4));
         }
 
         public bool ComboPWM(LegoPWM pwm1, LegoPWM pwm2, LegoChannel channel)

@@ -3,9 +3,14 @@ using Devkoes.Restup.WebServer.Models.Schemas;
 using IoTCoreHelpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Enumeration;
+using Windows.Devices.SerialCommunication;
+using Windows.Foundation;
+using Windows.System.Threading;
 
 namespace LegoTrain
 {
@@ -16,6 +21,9 @@ namespace LegoTrain
         static private Signal mySignal;
         static private Switch mySwitch;
         static private ParamRail myParamRail;
+        static private Task ThreadReading = null;
+        static private Serial mySerial = null;
+        static private bool isSerialRunning = false;
 
         public static async Task InitTrain()
         {
@@ -27,8 +35,83 @@ namespace LegoTrain
             // then Signal
             mySignal = new Signal(myParamRail.NumberOfSignals);
             mySwitch = new Switch(myParamRail.NumberOfSwitchs, myParamRail.MinDuration, myParamRail.MaxDuration, myParamRail.MinAngle, myParamRail.MaxAngle, myParamRail.ServoAngle);
+            if (myParamRail.Serial)
+            {
+                mySerial = new Serial();
+                string aqs = SerialDevice.GetDeviceSelector();
+                var dis = await DeviceInformation.FindAllAsync(aqs);
+                SerialDevice serialPort = null;
+                for (int i = 0; i < dis.Count; i++)
+                {
+                    Debug.WriteLine(string.Format("Serial device found: {0}", dis[i].Id));
+                    if (dis[i].Id.IndexOf("BCM2836") != -1)
+                    {
+                        serialPort = await SerialDevice.FromIdAsync(dis[i].Id);
+                    }
+                }
+                mySerial.SelectAndInitSerial(serialPort).Wait();
+                isSerialRunning = true;
+                ThreadReading = ThreadPool.RunAsync(ContinuousUpdate, WorkItemPriority.High).AsTask();
+            }
         }
 
+        static private void ContinuousUpdate(IAsyncAction action)
+        {
+            while (isSerialRunning)
+            {
+                try
+                {
+                    var ret = mySerial.ReadSerial().Result;
+                    if (ret != null)
+                    {
+                        //TODO convert to string
+                        string url = Encoding.UTF8.GetString(ret);
+                        //find which page is called
+                        bool result = false;
+                        string sig = "";
+                        if (url.ToLower().Contains(pageCombo))
+                            result = DecryptCombo(url);
+                        else if (url.ToLower().Contains(pageComboAll))
+                            result = DecryptComboAll(url);
+                        else if (url.ToLower().Contains(pageContinuous))
+                            result = DecryptContinuous(url);
+                        else if (url.ToLower().Contains(pageContinuousAll))
+                            result = DecryptContinuousAll(url);
+                        else if (url.ToLower().Contains(pageSingleCST))
+                            result = DecryptSingleCST(url);
+                        else if (url.ToLower().Contains(pagePWM))
+                            result = DecryptComboPWM(url);
+                        else if (url.ToLower().Contains(pagePWMAll))
+                            result = DecryptComboPWMAll(url);
+                        else if (url.ToLower().Contains(pageSingleOutput))
+                            result = DecryptSinglePWM(url);
+                        else if (url.ToLower().Contains(pageSingleOutputAll))
+                            result = DecryptSinglePWMAll(url);
+                        else if (url.ToLower().Contains(pageSingleTimeout))
+                            result = DecryptSingleTimeout(url);
+                        else if (url.ToLower().Contains(pageSignal))
+                            sig = DecryptSignal(url);
+                        else if (url.ToLower().Contains(pageSwitch))
+                            sig = DecryptSwitch(url);
+                        if (sig == "")
+                        {
+                            if (result)
+                                sig = strOK;
+                            else
+                                sig = strProblem;
+                        }
+                        mySerial.WriteSerial(Encoding.UTF8.GetBytes(sig));
+                    }
+
+                }
+                catch (Exception ex)
+                {
+
+                    Debug.WriteLine(ex.Message);
+                }
+
+            }
+        }
         private bool SecCheck(string strFilePath)
         {
             if (strFilePath.IndexOf(securityKey) == -1)
@@ -69,6 +152,14 @@ namespace LegoTrain
             if (!SecCheck(param))
                 return new GetResponse(GetResponse.ResponseStatus.OK, ErrorAuth());
             return ProcessComboAll(param);
+        }
+
+        [UriFormat("/combopwmall.aspx{param}")]
+        public GetResponse ComboPWMAll(string param)
+        {
+            if (!SecCheck(param))
+                return new GetResponse(GetResponse.ResponseStatus.OK, ErrorAuth());
+            return ProcessComboPWMAll(param);
         }
 
         [UriFormat("/combopwm.aspx{param}")]
@@ -156,5 +247,5 @@ namespace LegoTrain
             return ProcessDisplayDefault(param);
         }
     }
-       
+
 }

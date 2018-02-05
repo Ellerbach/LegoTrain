@@ -65,6 +65,7 @@ namespace LegoTrain
         const string pageSingleOutputAll = "singlepwmall.aspx";
         const string pageSingleCST = "singlecst.aspx";
         const string pagePWM = "combopwm.aspx";
+        const string pagePWMAll = "combopwmall.aspx";
         const string pageContinuous = "continuous.aspx";
         const string pageContinuousAll = "continuousall.aspx";
         const string pageSingleTimeout = "timeout.aspx";
@@ -81,6 +82,8 @@ namespace LegoTrain
         const string paramSingleOutput = "op";
         const string paramComboPWM1 = "p1";
         const string paramComboPWM2 = "p2";
+        const string paramComboPWMR = "pwr";
+        const string paramComboPWMB = "pwb";
         const string paramContinuousFct = "fc";
         const string paramMode = "md";
         const string paramNoUI = "no";

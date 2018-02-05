@@ -23,7 +23,7 @@ namespace LegoTrain
             return new GetResponse(GetResponse.ResponseStatus.OK, strResp);
         }
 
-        private string DecryptSwitch(string rawURL)
+        static private string DecryptSwitch(string rawURL)
         {
             // decode params
             List<Param> Params = Param.decryptParam(rawURL);
@@ -83,7 +83,7 @@ namespace LegoTrain
             return new GetResponse(GetResponse.ResponseStatus.OK, DecryptSwitch(rawURL));
         }
 
-        private string DecryptSignal(string rawURL)
+        static private string DecryptSignal(string rawURL)
         {
             // decode params
             List<Param> Params = Param.decryptParam(rawURL);
@@ -143,7 +143,7 @@ namespace LegoTrain
             return new GetResponse(GetResponse.ResponseStatus.OK, DecryptSignal(rawURL));
         }
 
-        private bool DecryptCombo(string StrDecrypt)
+        static private bool DecryptCombo(string StrDecrypt)
         {
             // decode params
             List<Param> Params = Param.decryptParam(StrDecrypt);
@@ -176,7 +176,7 @@ namespace LegoTrain
             return isvalid;
         }
 
-        private bool DecryptComboAll(string StrDecrypt)
+        static private bool DecryptComboAll(string StrDecrypt)
         {
             // decode params
             List<Param> Params = Param.decryptParam(StrDecrypt);
@@ -232,7 +232,7 @@ namespace LegoTrain
             return new GetResponse(GetResponse.ResponseStatus.OK, strResp);
         }
 
-        private bool DecryptSinglePWM(string strDecrypt)
+        static private bool DecryptSinglePWM(string strDecrypt)
         {
             // decode params
             List<Param> Params = Param.decryptParam(strDecrypt);
@@ -266,7 +266,7 @@ namespace LegoTrain
 
         }
 
-        private bool DecryptSinglePWMAll(string strDecrypt)
+        static private bool DecryptSinglePWMAll(string strDecrypt)
         {
             // decode params
             List<Param> Params = Param.decryptParam(strDecrypt);
@@ -320,7 +320,7 @@ namespace LegoTrain
             return new GetResponse(GetResponse.ResponseStatus.OK, strResp);
         }
 
-        private bool DecryptSingleCST(string strDecrypt)
+        static private bool DecryptSingleCST(string strDecrypt)
         {
             // decode params
             List<Param> Params = Param.decryptParam(strDecrypt);
@@ -360,7 +360,7 @@ namespace LegoTrain
             return new GetResponse(GetResponse.ResponseStatus.OK, strResp);
         }
 
-        private bool DecryptComboPWM(string strDecrypt)
+        static private bool DecryptComboPWM(string strDecrypt)
         {
             // decode params
             List<Param> Params = Param.decryptParam(strDecrypt);
@@ -401,7 +401,54 @@ namespace LegoTrain
             return new GetResponse(GetResponse.ResponseStatus.OK, strResp);
         }
 
-        private bool DecryptContinuous(string strDecrypt)
+        static private bool DecryptComboPWMAll(string strDecrypt)
+        {
+            // decode params
+            List<Param> Params = Param.decryptParam(strDecrypt);
+            bool isvalid = true;
+            //check if Params contains anything and is valid
+            if (Params == null)
+                return false;
+            if (Params.Count == 0)
+                return false;
+
+            LegoPWM[] mPWMR = new LegoPWM[4];
+            LegoPWM[] mPWMB = new LegoPWM[4];
+
+            for (int i = 0; i < 4; i++)
+            {
+                int pwr = Param.CheckConvertInt32(Params, paramComboPWMR + i);
+                if (!((pwr >= (int)LegoPWM.FLT) && (pwr <= (int)LegoPWM.REV1)))
+                    isvalid = false;
+                else
+                    mPWMR[i] = (LegoPWM)pwr;
+                int pwb = Param.CheckConvertInt32(Params, paramComboPWMB + i);
+                if (!((pwb >= (int)LegoPWM.FLT) && (pwb <= (int)LegoPWM.REV1)))
+                    isvalid = false;
+                else
+                    mPWMB[i] = (LegoPWM)pwb;
+            }
+            if (isvalid)
+            {
+                isvalid = myLego.ComboPWMAll(mPWMR, mPWMB);
+            }
+            else
+                isvalid = false;
+
+            return isvalid;
+        }
+
+        private GetResponse ProcessComboPWMAll(string rawURL)
+        {
+            string strResp = "";
+            if (DecryptComboPWMAll(rawURL))
+                strResp = strOK;
+            else
+                strResp = strProblem;
+            return new GetResponse(GetResponse.ResponseStatus.OK, strResp);
+        }
+
+        static private bool DecryptContinuous(string strDecrypt)
         {
             // decode params
             List<Param> Params = Param.decryptParam(strDecrypt);
@@ -432,7 +479,7 @@ namespace LegoTrain
             return isvalid;
         }
 
-        private bool DecryptContinuousAll(string strDecrypt)
+        static private bool DecryptContinuousAll(string strDecrypt)
         {
             // decode params
             List<Param> Params = Param.decryptParam(strDecrypt);
@@ -472,7 +519,7 @@ namespace LegoTrain
                 strResp = strOK;
             else
                 strResp = strProblem;
-           return new GetResponse(GetResponse.ResponseStatus.OK, strResp);
+            return new GetResponse(GetResponse.ResponseStatus.OK, strResp);
         }
 
         private GetResponse ProcessContinuousAll(string rawURL)
@@ -485,7 +532,7 @@ namespace LegoTrain
             return new GetResponse(GetResponse.ResponseStatus.OK, strResp);
         }
 
-        private bool DecryptSingleTimeout(string strDecrypt)
+        static private bool DecryptSingleTimeout(string strDecrypt)
         {
             // decode params
             List<Param> Params = Param.decryptParam(strDecrypt);
@@ -612,6 +659,50 @@ namespace LegoTrain
             strResp += "<option label='REV1'>15</option>";
             strResp += "</select> Channel<select id=\"Channel\" name=\"ch\"><option label='CH1'>0</option><option label='CH2'>1</option><option label='CH3'>2</option><option label='CH4'>3</option>";
             strResp += "</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input id=\"Submit4\" type=\"submit\" value=\"Send\" /></p>";
+            strResp += "<input type=\"hidden\" name=\"" + paramSecurityKey + "\" value=\"" + MySecurityKey + "\"></form>";
+            //4 ComboPWMAll
+            // TODO TODO TODO TODO
+            strResp += "<form method=\"get\" action=\"combopwmall.aspx\" target=\"_blank\"><p>ComboPWMAll Mode<br />";
+            for (int i = 0; i < 4; i++)
+            {
+                strResp += "PWM Red<select id=\"PWM1\" name=\"pwr" + i + "\">";
+                strResp += "<option label='FLT'>0</option>";
+                strResp += "<option label='FWD1'>1</option>";
+                strResp += "<option label='FWD2'>2</option>";
+                strResp += "<option label='FWD3'>3</option>";
+                strResp += "<option label='FWD4'>4</option>";
+                strResp += "<option label='FWD5'>5</option>";
+                strResp += "<option label='FWD6'>6</option>";
+                strResp += "<option label='FWD7'>7</option>";
+                strResp += "<option label='BRK'>8</option>";
+                strResp += "<option label='REV7'>9</option>";
+                strResp += "<option label='REV6'>10</option>";
+                strResp += "<option label='REV5'>11</option>";
+                strResp += "<option label='REV4'>12</option>";
+                strResp += "<option label='REV3'>13</option>";
+                strResp += "<option label='REV2'>14</option>";
+                strResp += "<option label='REV1'>15</option></select>";
+                strResp += "PWM Blue<select id=\"PWM2\" name=\"pwb" + i + "\">";
+                strResp += "<option label='FLT'>0</option>";
+                strResp += "<option label='FWD1'>1</option>";
+                strResp += "<option label='FWD2'>2</option>";
+                strResp += "<option label='FWD3'>3</option>";
+                strResp += "<option label='FWD4'>4</option>";
+                strResp += "<option label='FWD5'>5</option>";
+                strResp += "<option label='FWD6'>6</option>";
+                strResp += "<option label='FWD7'>7</option>";
+                strResp += "<option label='BRK'>8</option>";
+                strResp += "<option label='REV7'>9</option>";
+                strResp += "<option label='REV6'>10</option>";
+                strResp += "<option label='REV5'>11</option>";
+                strResp += "<option label='REV4'>12</option>";
+                strResp += "<option label='REV3'>13</option>";
+                strResp += "<option label='REV2'>14</option>";
+                strResp += "<option label='REV1'>15</option>";
+                //strResp += "</select> Channel<select id=\"Channel\" name=\"ch\"><option label='CH1'>0</option><option label='CH2'>1</option><option label='CH3'>2</option><option label='CH4'>3</option>";
+                strResp += "</select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+            }
+            strResp = "<input id=\"Submit4\" type=\"submit\" value=\"Send\" /></p>";
             strResp += "<input type=\"hidden\" name=\"" + paramSecurityKey + "\" value=\"" + MySecurityKey + "\"></form>";
             //strResp = WebServer.OutPutStream(response, strResp);
             //5 Single CST
