@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34408.163
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "SignalSwitch", "SignalSwitch\SignalSwitch.nfproj", "{CFEAA9A9-342B-480B-AEFB-19A889C81E47}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedServices", "SharedServices\SharedServices.shproj", "{B468D363-C9C1-4C40-990D-6858660E2256}"
+EndProject
+Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "LegoInfrared", "LegoInfrared\LegoInfrared.nfproj", "{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0F4BC2C6-7315-489D-80E5-D4CEF1DE28A9}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SharedServices\SharedServices.projitems*{b468d363-c9c1-4c40-990d-6858660e2256}*SharedItemsImports = 13
+	EndGlobalSection
+EndGlobal
