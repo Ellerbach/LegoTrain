@@ -1,0 +1,23 @@
+# Base image for ARM64
+FROM mcr.microsoft.com/dotnet/aspnet:7.0.14-bullseye-slim-arm64v8 AS base-arm64
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
+EXPOSE 2024/udp
+
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+WORKDIR /src
+COPY ["LegoTrain/LegoTrain.csproj", "LegoTrain/"]
+RUN dotnet restore "LegoTrain/LegoTrain.csproj"
+COPY . .
+WORKDIR "/src/LegoTrain"
+RUN dotnet build "LegoTrain.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "LegoTrain.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Final stage for ARM64
+FROM base-arm64 AS final-arm64
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "LegoTrain.dll"]

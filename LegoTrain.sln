@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34408.163
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "SignalSwitch", "SignalSwitch\SignalSwitch.nfproj", "{CFEAA9A9-342B-480B-AEFB-19A889C81E47}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedServices", "SharedServices\SharedServices.shproj", "{B468D363-C9C1-4C40-990D-6858660E2256}"
+EndProject
+Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "LegoInfrared", "LegoInfrared\LegoInfrared.nfproj", "{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LegoTrain", "LegoTrain\LegoTrain.csproj", "{A8FADDBD-BDA0-41DA-9F4F-3846D22A6874}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "nanoDiscovery", "nanoDiscovery\nanoDiscovery.shproj", "{4223AE41-B2A2-4781-8428-EDA32F51FF5F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscoveryMessageTests", "DiscoveryMessageTests\DiscoveryMessageTests.csproj", "{84C6A0BA-A8A3-4A0F-92E7-95A655082FFB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFEAA9A9-342B-480B-AEFB-19A889C81E47}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A9D6589-5F7B-489C-AF6C-0AECADB0DF71}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A8FADDBD-BDA0-41DA-9F4F-3846D22A6874}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8FADDBD-BDA0-41DA-9F4F-3846D22A6874}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8FADDBD-BDA0-41DA-9F4F-3846D22A6874}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8FADDBD-BDA0-41DA-9F4F-3846D22A6874}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84C6A0BA-A8A3-4A0F-92E7-95A655082FFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84C6A0BA-A8A3-4A0F-92E7-95A655082FFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84C6A0BA-A8A3-4A0F-92E7-95A655082FFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84C6A0BA-A8A3-4A0F-92E7-95A655082FFB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0F4BC2C6-7315-489D-80E5-D4CEF1DE28A9}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		nanoDiscovery\nanoDiscovery.projitems*{4223ae41-b2a2-4781-8428-eda32f51ff5f}*SharedItemsImports = 13
+		nanoDiscovery\nanoDiscovery.projitems*{84c6a0ba-a8a3-4a0f-92e7-95a655082ffb}*SharedItemsImports = 5
+		nanoDiscovery\nanoDiscovery.projitems*{a8faddbd-bda0-41da-9f4f-3846d22a6874}*SharedItemsImports = 5
+		SharedServices\SharedServices.projitems*{b468d363-c9c1-4c40-990d-6858660e2256}*SharedItemsImports = 13
+	EndGlobalSection
+EndGlobal

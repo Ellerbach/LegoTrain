@@ -1,0 +1,129 @@
+﻿@model LegoTrain.Models.AppConfiguration
+
+@{
+    ViewData["Title"] = "Configuration";
+}
+
+<h1>Infrared, signals and switches configuration.</h1>
+<div>
+    @Html.ActionLink("See trains configuration", "Index", "Train")
+    <br />
+    @Html.ActionLink("See signals configuration", "Index", "Signal")
+    <br />
+    @Html.ActionLink("See switches configuration", "Index", "Switch")
+</div>
+<div>
+    <hr />
+    <dl class="row">
+        <div>
+            Lego Infrared configuration seems
+            @{
+                if (!Model.Infrared.IsConnected)
+                {
+                    <b>not valid. The infrared module must be connected.</b>
+                }
+                else
+                {
+                    <b>valid.</b>
+                    <div>The IP Address is @Model.Infrared.IPAddress</div>
+                }
+            }
+        </div>
+        <div>
+            Signal configuration seems
+            @{
+                if (Model.SignalManagement == null)
+                {
+                    <b>not valid.</b>
+                }
+                else
+                {
+                    <b>valid.</b>
+                    if (Model.Signals.Count > 0)
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>@Html.DisplayNameFor(model => model.Signals.FirstOrDefault().Id)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Signals.FirstOrDefault().Name)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Signals.FirstOrDefault().X)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Signals.FirstOrDefault().Y)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Signals.FirstOrDefault().IPAddress)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Signals.FirstOrDefault().IsConnected)</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Signals)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelitem => item.Id)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.Name)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.X)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.Y)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.IPAddress)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.IsConnected)</td>
+                                        <td>
+                                            @Html.ActionLink("Details", "Details", "Signal", new { @item.Id }) |
+                                            @Html.ActionLink("Edit", "Edit", "Signal", new { @item.Id }) |
+                                            @Html.ActionLink("Delete", "Delete", "Signal", new { @item.Id })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                }
+            }
+        </div>
+        <div>
+            Switch configuration seems
+            @{
+                if (Model.SwitchManagement == null)
+                {
+                    <b>not valid.</b>
+                }
+                else
+                {
+                    <b>valid.</b>
+                    if (Model.Switches.Count > 0)
+                    {
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>@Html.DisplayNameFor(model => model.Switches.FirstOrDefault().Id)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Switches.FirstOrDefault().Name)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Switches.FirstOrDefault().X)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Switches.FirstOrDefault().Y)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Switches.FirstOrDefault().IsLeft)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Switches.FirstOrDefault().IPAddress)</th>
+                                    <th>@Html.DisplayNameFor(model => model.Switches.FirstOrDefault().IsConnected)</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Switches)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelitem => item.Id)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.Name)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.X)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.Y)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.IsLeft)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.IPAddress)</td>
+                                        <td>@Html.DisplayFor(modelitem => item.IsConnected)</td>
+                                        <td>
+                                            @Html.ActionLink("Details", "Details", "Switch", new { @item.Id }) |
+                                            @Html.ActionLink("Edit", "Edit", "Switch", new { @item.Id }) |
+                                            @Html.ActionLink("Delete", "Delete", "Switch", new { @item.Id })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                }
+            }
+        </div>
+    </dl>
+</div>

@@ -1,0 +1,49 @@
+﻿@model Signal
+
+<h2>Signal details</h2>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.X)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.X)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Y)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Y)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IPAddress)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IPAddress)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IsConnected)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IsConnected)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

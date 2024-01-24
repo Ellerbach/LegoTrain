@@ -1,0 +1,66 @@
+﻿@model LegoTrain.Models.AppConfiguration
+@{
+    ViewData["Title"] = "Lego Train Home Page";
+}
+
+<script type="text/javascript" src="~/js/custom.js"></script>
+<div class="text-center">
+    @{
+        if (!Model.Infrared.IsConnected)
+        {
+            <div>
+                Lego Infrared is not properly setup. Please make sure your configuration is correct. Adjust it on <a href="/Configuration">the configuration page</a>.
+            </div>
+        }
+
+        if (Model.SwitchManagement == null)
+        {
+            <div>
+                Switch is not properly setup. Please make sure your configuration is correct. Adjust it on <a href="/Configuration">the configuration page</a>.
+            </div>
+        }
+
+        if (Model.SignalManagement == null)
+        {
+            <div>
+                Signal is not properly setup. Please make sure your configuration is correct. Adjust it on <a href="/Configuration">the configuration page</a>.
+            </div>
+        }
+    }
+    <table>
+        <TR>
+            @for (int i = 0; i < Model.Trains.Count; i++)
+            {
+                int speed = 16 - (int)Model.Trains[i].NominalSpeed;
+                int speedFwd = (int)Model.Trains[i].NominalSpeed;
+                int output = (int)Model.Trains[i].Output;
+                int channel = (int)Model.Trains[i].Channel;
+                string trainId = "train" + i;
+                <form>
+                <td>
+                        @Model.Trains[i].Name
+                </td>
+                <td>
+                    <input type="button" onClick="btnclicked(document.getElementById('@trainId'),'/api/singlepwm?pw=@speed&op=@output&ch=@channel')" value="<<" class="btn">
+                </td>
+                <td>
+                    <input type="button" onClick="btnclicked(document.getElementById('@trainId'),'/api/singlecst?pw=5&op=@output&ch=@channel')" value="<" class="btn">
+                </td>
+                <td>
+                    <input type="button" onClick="btnclicked(document.getElementById('@trainId'),'/api/singlepwm?pw=8&op=@output&ch=@channel')" value="Stop" class="btn">
+                </td>
+                <td>
+                    <input type="button" onClick="btnclicked(document.getElementById('@trainId'),'/api/singlecst?pw=4&op=@output&ch=@channel')" value=">" class="btn">
+                </td>
+                <td>
+                    <input type="button" onClick="btnclicked(document.getElementById('@trainId'),'/api/singlepwm?pw=@speedFwd&op=@output&ch=@channel')" value=">>" class="btn">
+                </td>
+                <td>
+                    <span id='@trainId'></span>
+                </td>
+                </form>
+            }
+        </TR>
+    </table>
+</div>
+@Html.RenderPartialAsync("_DisplayMapAndSignals", Model)
