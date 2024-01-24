@@ -15,14 +15,14 @@ namespace SharedServices.Controllers
     {
         public static IAppConfiguration AppConfiguration { get; set; }
 
-        [Route("configuration/config")]
+        [Route("config")]
         public void Config(WebServerEventArgs e)
         {
             // We need to clean things to get some memory
-            nanoFramework.Runtime.Native.GC.Run(true);
+            //nanoFramework.Runtime.Native.GC.Run(true);
 
             // TODO: check the basic authentication
-            string route = "<!DOCTYPE html><html><head><title>Configuration</title><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\"></head><body><fieldset><legend>Configuration</legend><form action=\"/configuration/process\" method=\"post\">";
+            string route = "<!DOCTYPE html><html><head><title>Configuration</title></head><body><fieldset><legend>Configuration</legend><form action=\"/process\" method=\"post\">";
             e.Context.Response.ContentType = "text/html";
             // It's the moment to create a new configuration
             
@@ -54,13 +54,13 @@ namespace SharedServices.Controllers
 
             // We need to clean things to get some memory
             //methods = null;
-            //Runtime.Native.GC.Run(true);
+            //nanoFramework.Runtime.Native.GC.Run(true);
 
-            route += "<input type=\"submit\" value=\"Submit\"></form></fieldset><br>Note*:<li>For the device type use 'Signal' or 'Switch' or 'Both'.</li><li>Leave unused settings to -1</li>.</body></html>";
+            route += "<input type=\"submit\" value=\"Submit\"></form></fieldset><br>Note:<li>For the device type use 'Signal' or 'Switch' or 'Both'.</li><li>Leave unused settings to -1</li><li>Device ID should start at 1.</li>.</body></html>";
             WebServer.OutPutStream(e.Context.Response, route);
         }
 
-        [Route("configuration/process")]
+        [Route("process")]
         [Method("POST")]
         public void Process(WebServerEventArgs e)
         {
@@ -97,14 +97,14 @@ namespace SharedServices.Controllers
             // We need to clean things to get some memory
             nanoFramework.Runtime.Native.GC.Run(true);
             AppConfiguration.Save();
-            string route = $"<!DOCTYPE html><html><head><title>Configuration Page</title><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\"></head><body>Configuration saved and updated. Return to the <a href=\"http://{Wireless80211.GetCurrentIPAddress()}\">home page</a>.</body></html>";
+            string route = $"<!DOCTYPE html><html><head><title>Configuration Page</title></head><body>Configuration saved and updated. Return to the <a href=\"http://{Wireless80211.GetCurrentIPAddress()}\">home page</a>.</body></html>";
             WebServer.OutPutStream(e.Context.Response, route);
         }
 
-        [Route("configuration/resetwifi")]
+        [Route("resetwifi")]
         public void ResetWifi(WebServerEventArgs e)
         {
-            string route = $"<!DOCTYPE html><html><head><title>Lego Infrared Wireless Configuration</title><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\"></head><body>" +
+            string route = $"<!DOCTYPE html><html><head><title>Lego Infrared Wireless Configuration</title></head><body>" +
                     "<h1>Wireless Lego Infrared Configuration</h1>" +
                     "<form method='POST' action='/'>" +
                     "<fieldset><legend>Wireless configuration</legend>" +

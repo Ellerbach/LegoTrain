@@ -98,6 +98,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="..\SharedServices\SharedServices.projitems" Label="Shared" />
+  <Import Project="..\nanoDiscovery\nanoDiscovery.projitems" Label="Shared" />
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets')" />
   <ProjectExtensions>
     <ProjectCapabilities>

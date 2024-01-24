@@ -1,0 +1,39 @@
+﻿@model IEnumerable<Signal>
+
+<h2>List of signals</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Id)</th>
+            <th>@Html.DisplayNameFor(model => model.Name)</th>
+            <th>@Html.DisplayNameFor(model => model.X)</th>
+            <th>@Html.DisplayNameFor(model => model.Y)</th>
+            <th>@Html.DisplayNameFor(model => model.IPAddress)</th>
+            <th>@Html.DisplayNameFor(model => model.IsConnected)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelitem => item.Id)</td>
+                <td>@Html.DisplayFor(modelitem => item.Name)</td>
+                <td>@Html.DisplayFor(modelitem => item.X)</td>
+                <td>@Html.DisplayFor(modelitem => item.Y)</td>
+                <td>@Html.DisplayFor(modelitem => item.IPAddress)</td>
+                <td>@Html.DisplayFor(modelitem => item.IsConnected)</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+    <p>
+        @Html.ActionLink("Create New", "Create", "Signal", new { @class = "btn btn-primary" })
+    </p>
+</table>

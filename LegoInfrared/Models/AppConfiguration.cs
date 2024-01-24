@@ -8,14 +8,14 @@ using System.IO;
 
 namespace LegoElement.Models
 {
-    public class AppConfiguration
+    public class AppConfiguration : IAppConfiguration
     {
         private const string FileName = "I:\\config.json";
-        private int _spiBus = -1;
         private int _spiChipSelect = -1;
         private int _spiClock = -1;
         private int _spiMosi = -1;
         private int _spiMiso = -1;
+        private int _gpioLed = -1;
 
         public delegate void ConfigurationUpdated(object sender, ConfigurationEventArgs e);
         public event ConfigurationUpdated OnConfigurationUpdated;
@@ -40,21 +40,6 @@ namespace LegoElement.Models
 
         public AppConfiguration()
         {
-        }
-
-        public int SpiBus
-        {
-            get => _spiBus;
-            set
-            {
-                if (value == _spiBus)
-                {
-                    return;
-                }
-
-                _spiBus = value;
-                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(SpiBus)));
-            }
         }
 
         public int SpiChipSelect
@@ -115,6 +100,22 @@ namespace LegoElement.Models
                 _spiMiso = value;
                 OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(SpiMiso)));
             }
-        }        
+        }
+
+        public int LedGpio
+        {
+
+            get => _gpioLed;
+            set
+            {
+                if (_gpioLed == value)
+                {
+                    return;
+                }
+
+                _gpioLed = value;
+                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(LedGpio)));
+            }
+        }
     }
 }

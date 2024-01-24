@@ -33,7 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Iot.Device.DhcpServer">
-      <HintPath>..\packages\nanoFramework.Iot.Device.DhcpServer.1.2.407\lib\Iot.Device.DhcpServer.dll</HintPath>
+      <HintPath>..\packages\nanoFramework.Iot.Device.DhcpServer.1.2.443\lib\Iot.Device.DhcpServer.dll</HintPath>
     </Reference>
     <Reference Include="Iot.Device.ServoMotor">
       <HintPath>..\packages\nanoFramework.Iot.Device.ServoMotor.1.2.436\lib\Iot.Device.ServoMotor.dll</HintPath>
@@ -84,7 +84,7 @@
       <HintPath>..\packages\nanoFramework.System.IO.Streams.1.1.52\lib\System.IO.Streams.dll</HintPath>
     </Reference>
     <Reference Include="System.Net">
-      <HintPath>..\packages\nanoFramework.System.Net.1.10.64\lib\System.Net.dll</HintPath>
+      <HintPath>..\packages\nanoFramework.System.Net.1.10.68\lib\System.Net.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http">
       <HintPath>..\packages\nanoFramework.System.Net.Http.Server.1.5.113\lib\System.Net.Http.dll</HintPath>
@@ -100,6 +100,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="..\SharedServices\SharedServices.projitems" Label="Shared" />
+  <Import Project="..\nanoDiscovery\nanoDiscovery.projitems" Label="Shared" />
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets')" />
   <ProjectExtensions>
     <ProjectCapabilities>

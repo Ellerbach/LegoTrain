@@ -7,6 +7,7 @@ using System;
 using System.Threading;
 using System.Net.Sockets;
 using System.Diagnostics;
+using nanoDiscovery;
 
 namespace SharedServices.Services
 {
@@ -67,11 +68,12 @@ namespace SharedServices.Services
                         {
                             byte[] recvBuffer = new byte[_udpClient.Available];
                             _udpClient.Client.ReceiveFrom(recvBuffer, ref from);
-                            var resp = Encoding.UTF8.GetString(recvBuffer, 0, recvBuffer.Length);
-                            Console.WriteLine(resp);
-                            if (resp == "LEGO:1:DISCO")
+                            var res = DiscoveryMessage.DecodeMessage(recvBuffer, out DiscoveryMessageType messageType, out sbyte id, out IPAddress ip, out byte[] payload);
+
+                            Console.WriteLine($"MSG: {BitConverter.ToString(recvBuffer)}, decode: {res}, type: {messageType}");
+                            if (res && messageType == DiscoveryMessageType.Discovery)
                             {
-                                SendCapabilities();
+                                SendCapabilities(((IPEndPoint)from).Address);
                             }
                         }
 
@@ -81,7 +83,7 @@ namespace SharedServices.Services
                     catch (Exception ex)
                     {
                         Debug.WriteLine($"LegoDiscovery: {ex.Message}");
-                    }                    
+                    }
                 }
 
                 IsRunning = false;
@@ -93,13 +95,19 @@ namespace SharedServices.Services
 
         public void Stop() => _tokenSource?.Cancel();
 
-        public void SendCapabilities()
+        public void SendCapabilities(IPAddress ip = default)
         {
             try
             {
-                string capabilities = $"LEGO:1:ID={_deviceId}:IP={_ipAddress}{_capabilities}";
-                var data = Encoding.UTF8.GetBytes(capabilities);
-                _udpClient.Send(data, 0, data.Length, new IPEndPoint(IPAddress.Parse("255.255.255.255"), BindingPort));
+                string capabilities = $"{_capabilities.TrimStart(':')}";
+                var payload = Encoding.UTF8.GetBytes(capabilities);
+                var data = DiscoveryMessage.CreateMessage(DiscoveryMessageType.Capabilities, (sbyte)_deviceId, _ipAddress, payload);
+                if(ip == default)
+                {
+                    ip = IPAddress.Parse("255.255.255.255");
+                }
+
+                _udpClient.Send(data, 0, data.Length, new IPEndPoint(ip, BindingPort));
             }
             catch (Exception ex)
             {
@@ -111,13 +119,13 @@ namespace SharedServices.Services
         {
             try
             {
-                var data = Encoding.UTF8.GetBytes($"LEGO:1:BYEBYE:ID={_deviceId}:IP={_ipAddress}");
+                var data = DiscoveryMessage.CreateMessage(DiscoveryMessageType.Byebye, (sbyte)_deviceId, _ipAddress, null);
                 _udpClient.Send(data, 0, data.Length, new IPEndPoint(IPAddress.Parse("255.255.255.255"), BindingPort));
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Dico bybye: {ex.Message}");
-            }            
+            }
         }
     }
 }

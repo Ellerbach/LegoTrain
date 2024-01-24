@@ -1,0 +1,26 @@
+﻿@model LegoTrain.Models.AppConfiguration
+
+<div>
+    @for (int i = 0; i < Model.Switches.Count; i++)
+    {
+        string top = Model.Switches[i].Y + "px";
+        string left = Model.Switches[i].X + "px";
+        string switchId = "switch" + Model.Switches[i].Id;
+        string para = "si=" + Model.Switches[i].Id;
+        string datatype = Model.Switches[i].IsLeft ? "left" : "right";
+        <span style='position: absolute;margin-left:@left; margin-top:@top; top:findTop(document.all.MyImage); left:findLeft(document.all.MyImage);'>
+            <img border='0' src="" data-type="@datatype" id='@switchId' onClick="swclicked(document.getElementById('@switchId'), '@para');" />
+        </span>
+    }
+    @for (int i = 0; i < Model.Signals.Count; i++)
+    {
+        string top = Model.Signals[i].Y + "px";
+        string left = Model.Signals[i].X + "px";
+        string signalId = "signal" + Model.Signals[i].Id;
+        string para = "si=" + Model.Signals[i].Id;
+        <span style='position: absolute;margin-left:@left; margin-top:@top; top:findTop(document.all.MyImage); left:findLeft(document.all.MyImage);'>
+            <img border='0' src="" id='@signalId' onClick="siclicked(document.getElementById('@signalId'), '@para');" />
+        </span>
+    }
+    <img alt="Map of the city" id="MyImage" src="config/circuit.png" />
+</div>

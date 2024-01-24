@@ -1,6 +1,7 @@
 ﻿// Licensed to the Laurent Ellerbach under one or more agreements.
 // Laurent Ellerbach licenses this file to you under the MIT license.
 
+using nanoFramework.Hardware.Esp32;
 using nanoFramework.Runtime.Native;
 using nanoFramework.WebServer;
 using System;
@@ -10,7 +11,7 @@ using System.Web;
 
 namespace SharedServices.Services
 {
-    public static  class WebServerCommon
+    public static class WebServerCommon
     {
         public static void SetupWifi(WebServerEventArgs e)
         {
@@ -75,7 +76,8 @@ namespace SharedServices.Services
                 // Disable the Soft AP
                 WirelessAP.Disable();
                 Thread.Sleep(200);
-                Power.RebootDevice();
+                Sleep.EnableWakeupByTimer(new TimeSpan(0, 0, 0, 1));
+                Sleep.StartDeepSleep();
             }
         }
     }

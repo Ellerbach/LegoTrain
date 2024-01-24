@@ -1,8 +1,10 @@
-# Lego Infrared API documentation
+# Lego Infrared and Signal/Switch API documentation
 
 ## Purpose
 
-This documentation has the purpose to explain how to pilot and interact with the board and pilot either a Lego train, or any other FPS Lego element. This project requires to use the [nanoFramework.WebServerAndSerial sample](./Samples/nanoFramework/nanoFramework.WebServerAndSerial/).
+This documentation has the purpose to explain how to pilot and interact with the Lego Infrared and Lego Signal and Switch boards and pilot either a Lego train, or any other FPS Lego element. This project requires to use the  either a [Lego Infrared](./LegoInfrared/) module, either a [Lego Singal/Switch](./SignalSwitch/) one.
+
+Note that the code is built for ESP32 devices. This should be able to work with any ESP32 device.
 
 ## Introduction
 
@@ -10,24 +12,11 @@ The board can be piloted either thru HTTP or serial. Both are using a very simil
 
 ## Web server configuration
 
-The WebServer is configured by default on port 80. The only way to change it is in the code. You can go to the [<http://ipaddress/configuration>](http://ipaddress/configuration) to setup a basic authentication. By default, the login and password are empty. You still need to say you're using a basic authentication to have it working. If you need to change the port because you want to expose it on the internet, I recommend you to change the route in your router and not the port on the device.
+The WebServer is configured by default on port 80. The only way to change it is in the code. If you need to change the port because you want to expose it on the internet, I recommend you to change the route in your router and not the port on the device.
 
-## Serial port configuration
+## Configuration of the elements
 
-The serial port is configured with the following settings:
-
-```csharp
-BaudRate = 115200;
-DataBits = 8;
-Parity = Parity.None;
-StopBits = StopBits.One;
-Handshake = Handshake.None;
-ReadTimeout = 10;
-```
-
-As for the web server, there is no way to change the settings in a configuration file. To change them, you'll have to change the values in the code and recompile the project.
-
-The serial port GPIO pins has to be setup in the config page [<http://ipaddress/configuration>](http://ipaddress/configuration).
+ You can go to the [<http://ipaddress/configuration/config>](http://ipaddress/configuration/config). Depending on the type of board, you'll get a different configuration page.
 
 ## HTTP Communication protocol
 
@@ -40,18 +29,6 @@ The answer is either 200 OK either Bad Request 400.
 * There is a series of parameters depending on what you are calling.
 
 Here is the list of all available arguments. Please note that none of the arguments or the page name is case sensitive. They **must** be lowercase.
-
-## Serial communication protocol
-
-The serial protocol is very similar to the HTTP one. Main difference is that only the page and the arguments are send. and no security key is required.
-
-So a command looks like switch?si=0&md=0\r
-
-Return values is either OK\r or Problem\r
-
-The \r is the return character which mark the end of the line. All arguments are the same as for the http protocol.
-
-The only difference is that when using the 'no' argument and a value different from 0 to 7 for 'si', the return is 00101000\r which does represent the positioning of the switches. Be careful as if you are not using the 'no' argument, you'll get an HTML answer similar to the one from HTTP protocol.
 
 ## Piloting a Lego FPS
 
@@ -454,7 +431,7 @@ usage: `signal?si=2&md=0`
 
 ### si
 
-This is the signal number from 0 to 16.
+This is the signal number id.
 
 ### md
 
@@ -468,7 +445,7 @@ usage: `switch?si=2&md=0`
 
 ### si
 
-This is the switch number from 0 to 16.
+This is the switch number id.
 
 ### md
 

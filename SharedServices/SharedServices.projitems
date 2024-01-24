@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Controllers\ConfigurationController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\ConfigurationEventArgs.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\IAppConfiguration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\Blinky.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\LegoDiscovery.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\WebServerCommon.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\Wireless80211.cs" />

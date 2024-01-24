@@ -21,6 +21,7 @@ namespace LegoElement.Models
         private int _servoPin = -1;
         private int _gpioRed = -1;
         private int _gpioGreen = -1;
+        private int _gpioLed = -1;
 
         public delegate void ConfigurationUpdated(object sender, ConfigurationEventArgs e);
         public event ConfigurationUpdated OnConfigurationUpdated;
@@ -166,6 +167,22 @@ namespace LegoElement.Models
 
                 _gpioGreen = value;
                 OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(SignalGpioGreen)));
+            }
+        }
+
+        public int LedGpio
+        {
+
+            get => _gpioLed;
+            set
+            {
+                if (_gpioLed == value)
+                {
+                    return;
+                }
+
+                _gpioLed = value;
+                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(LedGpio)));
             }
         }
     }

@@ -91,5 +91,23 @@ namespace LegoElement.Controllers
 
             WebServer.OutputHttpCode(e.Context.Response, ret ? HttpStatusCode.OK : HttpStatusCode.BadRequest);
         }
+
+        [Route("api/" + PageComboPwmAll)]
+        public void ComboPwmAll(WebServerEventArgs e)
+        {
+            // http://192.168.1.85/combowmall?pwr0=0&pwb0=0&pwr1=0&pwb1=0&pwr2=0&pwb2=0&pwr3=0&pwb3=0
+            var ret = LegoInfraredExecute.ComboPwmAll(e.Context.Request.RawUrl);
+
+            WebServer.OutputHttpCode(e.Context.Response, ret ? HttpStatusCode.OK : HttpStatusCode.BadRequest);
+        }
+
+        [Route("api/" + PageComboPwm)]
+        public void ComboPwm(WebServerEventArgs e)
+        {
+            // http://192.168.1.85/combopwm?rd=0&bl=0&ch=0
+            var ret = LegoInfraredExecute.ComboPwm(e.Context.Request.RawUrl);
+
+            WebServer.OutputHttpCode(e.Context.Response, ret ? HttpStatusCode.OK : HttpStatusCode.BadRequest);
+        }
     }
 }

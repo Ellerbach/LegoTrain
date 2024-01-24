@@ -12,7 +12,7 @@ namespace LegoElement.Controllers
     {
         private const string ParamSignal = "md";
 
-        [Route("api/signal")]
+        [Route("signal")]
         public void Signal(WebServerEventArgs e)
         {
             var parameters = WebServer.DecodeParam(e.Context.Request.RawUrl);
@@ -56,13 +56,13 @@ namespace LegoElement.Controllers
             return;
         }
 
-        [Route("api/signalstatus")]
+        [Route("signalstatus")]
         public void SignalStatus(WebServerEventArgs e)
         {
             WebServer.OutPutStream(e.Context.Response, Application.Signal.State.ToString());
         }
 
-        [Route("api/switch")]
+        [Route("switch")]
         public void Switch(WebServerEventArgs e)
         {
             var parameters = WebServer.DecodeParam(e.Context.Request.RawUrl);
@@ -105,10 +105,10 @@ namespace LegoElement.Controllers
         }
 
 
-        [Route("api/switchstatus")]
+        [Route("switchstatus")]
         public void SwitchStatus(WebServerEventArgs e)
         {
-            WebServer.OutPutStream(e.Context.Response, Application.Switch.IsStraight ? "1" : "0");
+            WebServer.OutPutStream(e.Context.Response, Application.Switch.IsStraight ? "0" : "1");
         }
 
         private static bool TryConvertInt32(string val, out int result, int min, int max)

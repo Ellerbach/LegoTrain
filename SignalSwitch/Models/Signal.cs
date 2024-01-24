@@ -6,7 +6,7 @@ using System.Device.Gpio;
 
 namespace LegoElement.Models
 {
-    public class Signal:IDisposable
+    public class Signal : IDisposable
     {
         private readonly GpioController _gpio;
         private readonly int _pinRed;
@@ -15,8 +15,13 @@ namespace LegoElement.Models
 
         public Signal(int pinRed, int pinGreen)
         {
+            if((pinRed < 0) && (pinGreen < 0))
+            {
+                throw new ArgumentException();
+            }
+
             _pinRed = pinRed;
-            _pinGreen = pinGreen;
+            _pinGreen = pinGreen;            
             _gpio = new GpioController();
             _gpio.OpenPin(_pinRed, PinMode.Output);
             _gpio.OpenPin(_pinGreen, PinMode.Output);
@@ -46,8 +51,6 @@ namespace LegoElement.Models
 
         public void Dispose()
         {
-            _gpio?.ClosePin(_pinGreen);
-            _gpio?.ClosePin(_pinRed);
             _gpio?.Dispose();
         }
     }

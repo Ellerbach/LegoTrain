@@ -6,6 +6,7 @@ using nanoFramework.Runtime.Native;
 using System.Net;
 using System;
 using System.Net.NetworkInformation;
+using nanoFramework.Hardware.Esp32;
 
 namespace SharedServices.Services
 {
@@ -25,7 +26,8 @@ namespace SharedServices.Services
             {
                 // Reboot device to Activate Access Point on restart
                 Console.WriteLine($"Setup Soft AP, Rebooting device");
-                Power.RebootDevice();
+                Sleep.EnableWakeupByTimer(new TimeSpan(0, 0, 0, 1));
+                Sleep.StartDeepSleep();
             }
 
             var dhcpserver = new DhcpServer

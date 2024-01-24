@@ -29,6 +29,7 @@ namespace LegoElement
         private static LegoDiscovery _legoDiscovery;
         private static CancellationTokenSource _legoDiscoToken;
         private static bool _wifiApMode = false;
+        private static Blinky _blinky;
 
         public static void Main()
         {
@@ -36,21 +37,29 @@ namespace LegoElement
 
             // Try to read the configuration
             _appConfiguration = AppConfiguration.Load();
-            if (AppConfiguration != null)
+            if (AppConfiguration == null)
             {
-                SetSignal();
-                SetSwitch();
+                _appConfiguration = new AppConfiguration();
+                _appConfiguration.LedGpio = 8;
+                _appConfiguration.Save();
             }
 
-            _appConfiguration = AppConfiguration ?? new AppConfiguration();
             ConfigurationController.AppConfiguration = _appConfiguration;
-
+            SetSignal();
+            SetSwitch();
+            
             _wifiApMode = Wireless80211.ConnectOrSetAp();
+            _blinky = new Blinky(_appConfiguration.LedGpio);
 
             // If we are in normal mode, advertize the service
             if (!_wifiApMode)
             {
-                SetDiscovery();
+                SetDiscovery();                
+                _blinky.BlinkNormal();
+            }
+            else
+            {
+                _blinky.BlinkWaiWifi();
             }
 
             Console.WriteLine($"Connected with wifi credentials. IP Address: {(_wifiApMode ? WirelessAP.GetIP() : Wireless80211.GetCurrentIPAddress())}");
@@ -81,6 +90,11 @@ namespace LegoElement
             else if(e.ParamName.StartsWith("Device"))
             {
                 SetDiscovery();
+            }
+            else
+            {
+                _blinky?.Dispose();
+                _blinky.BlinkNormal();
             }
         }
 
@@ -160,20 +174,21 @@ namespace LegoElement
 
         private static void ServerCommandReceived(object obj, WebServerEventArgs e)
         {
-            if (e.Context.Request.RawUrl.StartsWith("/style.css"))
-            {
-                e.Context.Response.ContentType = "text/css";
-                WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
-                return;
-            }
-            else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
-            {
-                var ico = ResourceWeb.GetBytes(ResourceWeb.BinaryResources.favicon);
-                e.Context.Response.ContentType = "image/ico";
-                e.Context.Response.ContentLength64 = ico.Length;
-                e.Context.Response.OutputStream.Write(ico, 0, ico.Length);
-                return;
-            }
+            // Not enough memory to handle those!
+            //if (e.Context.Request.RawUrl.StartsWith("/style.css"))
+            //{
+            //    e.Context.Response.ContentType = "text/css";
+            //    WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
+            //    return;
+            //}
+            //else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
+            //{
+            //    var ico = ResourceWeb.GetBytes(ResourceWeb.BinaryResources.favicon);
+            //    e.Context.Response.ContentType = "image/ico";
+            //    e.Context.Response.ContentLength64 = ico.Length;
+            //    e.Context.Response.OutputStream.Write(ico, 0, ico.Length);
+            //    return;
+            //}
 
             if (_wifiApMode)
             {
@@ -196,7 +211,7 @@ namespace LegoElement
                     (AppConfiguration.DeviceType != AppConfiguration.Both) &&
                     (AppConfiguration.DeviceType != AppConfiguration.Switch))
                 {
-                    toOutput += "You haven't set a proper device type. Go to <a href=\"/configuration/config\">configuration</a><br/>";
+                    toOutput += "You haven't set a proper device type. Go to <a href=\"/config\">configuration</a><br/>";
                 }
                 else
                 {
@@ -204,8 +219,8 @@ namespace LegoElement
                     toOutput += $"Your device ID is {(AppConfiguration.DeviceId < 0 ? "invalid, it must be positive or zero." : AppConfiguration.DeviceId)}.<br>";
                 }
 
-                toOutput += "To configure your device please go to <a href=\"/configuration/config\">configuration</a>.<br/>";
-                toOutput += "Reset your wifi by cliking <a href=\"/configuration/resetwifi\">here</a>.";
+                toOutput += "To configure your device please go to <a href=\"/config\">configuration</a>.<br/>";
+                toOutput += "Reset your wifi by cliking <a href=\"/resetwifi\">here</a>.";
                 toOutput += "</body></html>";
                 WebServer.OutPutStream(e.Context.Response, toOutput);
                 return;

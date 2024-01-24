@@ -1,0 +1,36 @@
+﻿@model LegoTrain.Models.Train
+
+<h2>Edit</h2>
+
+<form asp-action="Edit">
+
+    @Html.HiddenFor(model => model.Id)
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Name, new { @class = "control-label" })
+        @Html.EditorFor(model => model.Name, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Channel, new { @class = "control-label" })
+        @Html.DropDownListFor(model => model.Channel, (SelectList)ViewBag.ChannelOptions, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.NominalSpeed, new { @class = "control-label" })
+        @Html.DropDownListFor(model => model.NominalSpeed, (SelectList)ViewBag.SpeedOptions, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Output, new { @class = "control-label" })
+        @Html.DropDownListFor(model => model.Output, (SelectList)ViewBag.OutputOptions, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

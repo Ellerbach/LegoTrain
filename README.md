@@ -1,68 +1,49 @@
 # LegoTrain
-IR Lego Power Function for train, switch control with servo motor, light signal. 
 
-This project allow to control any Lego Power Function and support all Lego modes including exclusive modes which can't be done thru any of the Lego remote control. 
-A specific module allow to control servo motors used to pilot Lego switches. Another module allow to pilot red/green signal lights.
+IR Lego Power Function for train, switch control with servo motor, light signal using remote wifi controlled MCU based on [ESP32-C3 super mini](https://www.bing.com/search?q=esp32-c3+super+mini&qs=n&form=QBRE&sp=-1&lq=0&pq=esp32-c3+super+mini&sc=9-19&sk=&cvid=465952776C5548268A0AC7C84DE5E692&ghsh=0&ghacc=0&ghpl=) running [.NET nanoFramework](https://www.nanoframework.net)!
+
+One LegoInfrared module allows to control any Lego Power Function and support all Lego modes including exclusive modes which can't be done thru any of the Lego remote control through API. Please refer to the [LegoInfrared project](https://github.com/Ellerbach/LegoInfrared) for more details. In our case, this module will control trains.
+
+Specific module allow to control servo motors used to pilot Lego switches and to pilot red/green signal lights.
 Check [this video](https://onedrive.live.com/redir?resid=ED3080C73007CBED!161097&authkey=!AG2N5T7Qx6PtG3A&ithint=video%2cMP4) to see in action the project in a real Lego city!
 
+## Setting up the wifi for each module
+
+Once the module flashed, you will be able to set the wifi to each module. For this, connect to the `LegoInfrared` wifi that is available, then go to the URL [<http://192.168.4.1>](http://192.168.4.1) from a browser, set the values and you'll be good to go! If you've done something wrong, the wifi hot spot will still be present and you can reenter the credentials.
+
+In case of success, the IP address of the module will be displayed. You can now connect back to your wifi and connect to the IP address of your module. You still need to give the module an ID in the case of the switches/signals ones. Each ID **must** be unique. You will also have to select if you want just the switch, the signal or both.
+
 ## Infrared
+
 The infrared module require a bit of electronic. You'll need a to drive enough power in the infrared led to be able to control trains or other Lego Power Functions in large rooms or with a lot of lights.
 For this, you'll need to build the equivalent electronic:
+
 ![Electronic for Infrared](/Assets/infrared.jpg)
 
-The MOSI pin is 19 and Enabled is pin number 24 on the Rpi2. Those are the 2 pins you need for the infrared part.
+The module is configured. You can change the default values if you're using a different model and make your own electronic.
 
 ## Switches
-Piloting switches require as well specific electronic. In this case multiplexing. Schema is quite simple for this:
-[schema of the 74HC4515](/http://www.nxp.com/documents/data_sheet/74HC_HCT4515_CNV.pdf)
-* A0 -> GPIO16 (pin 36)
-* A1 -> GPIO20 (pin 38)
-* A2 -> GPIO21 (pin 40)
-* A3 -> GPIO19 (pin 35)
-* E -> Ground
-* LE -> GPIO13 (pin 33)
-All output to be plugged to the driving pin of every servo motor. Servo motor to be at +5V voltage. The level of high for the 4515 is higher than the 3.3V delivered by the RPI, so no need of level converter to 5V.
+
+Servo motor to be at +5V voltage. The control pin should be connected to the configured pin.
 
 For the hardware part, you'll need simple servo motor, here is a basic view on how to integrate them with the Lego switch:
+
 ![Servo motor integration](/Assets/switches.jpg)
 
-##Signals
-Piloting signals is quite straight forward using the a 74HC595. You can virtually chain as many as you want to have as many signals.
-Please note that so far, it is limited in the code to 16. 
+## Signals
+
+Piloting signals is quite straight forward and you need a little bit of electronic:
+
 ![Electronic for signals](/Assets/signal.jpg)
-Every 74HC595 can handle 4 signals, chain them as for any 74HC595.
-* Pin 8 is ground
-* Pin 16 is VCC (+5V recommended)
-* Pin 14 to MOSI (pin 19) for the first 74HC595 of the chain. For the next one it has to be linked to the Pin 9 of the previous 74HC595
-* Pin 13 to ground (used to activate or not the 8 output)
-* Pin 12 to GPIO7 (pin 26), used to select the SPI
-* Pin 11 to GPIO11 pin 23 (called SCLK)
-* Pin 10 to +VSS (this one is used to reset if needed)
-* Pin 15, 1, 2, 3, 4, 5, 6, 7 are the output pin
-* Pin 9 has to be linked to the next 74HC595 of the chain if there are more than 1.
 
-## Setup files
-The project is using a setup file which contains all the train name, position of the switches, IR information. This is done thru the Excel file you can find [here](/Docs/Creating%20setup%20file.xlsx).
-Just copy the generated string and paste it to the file named [ParamTrain](/To%20deploy%20on%20device/ParamTrain.txt). Save it and deployit to the Raspberry.
-![File to copy](/Assets/file_to_copy.png)
-Copy the files from this location to the Raspberry into the user Package LocalState folder.
-You can create your own circuit picture using for [example PowerPoint](/Docs/Creating%20the%20circuit%20file.pptx), exporting it as an image (name must be circuit.png).
-Please note you can change all the train names, switches names as well. So far only use Ascii 7 codes, so accent and other non core Ascii caracters.
-The security key is required, you can leave it empty if you don't want any but need to add it to the URL in all cases like ?sec=
+## Circuit, signals and switches file
 
-## Loading the project and referencing other projects
-When loading the LegoTrain.sln solution, you'll need as well the following projects:
-* [RPI-Win10-Helpers](https://github.com/Ellerbach/RPI-Win10-Helpers)
-* My own fork of the excellent [Restup webserver](https://github.com/Ellerbach/restup)
-Note: working on using only the master of the Restup project. This will be done later on.
+You have a default circuit file that you can edit. A PowerPoint can be used to quickly create the circuit and the elements. Note [the name of the files](./LegoTrain/config) which **must** be the same.
 
 ## Running the project
-Once deployed on the Raspberry, you can make your project default project and it will be launched at boot time.
-Access it like http://IPaddress/circ.aspx?sec=Key234
-If all is correct, you should see a page like that:
-![Train](/Assets/train.jpg)
+
+To be done later. This section will include how to package the project and run it on a Raspberry PI or equivalent. Also how to run it on Docker and the necessary settings.
 
 ## Using the API
-API are available. Documentation in [this file](/Docs/Lego%20Infrared%20API%20doc.md). This does allow to pilot any Lego IR element, more than just trains. A test fuction for all the elements is available using the page which displays all the elements.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+API are available. Documentation in [this file](./Lego_api_doc.md). This does allow to pilot any Lego IR element, more than just trains.

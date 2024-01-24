@@ -14,7 +14,7 @@ namespace LegoElement.Models
 
         public Switch(int pinServo, int minPulse, int maxPulse)
         {
-            PwmChannel pwm = PwmChannel.CreateFromPin(pinServo, 50);
+            PwmChannel pwm = PwmChannel.CreateFromPin(pinServo, frequency: 50);
             _servoMotor = new ServoMotor(pwm, 180, minPulse, maxPulse);
             _servoMotor.Start();
             SetStraight();
