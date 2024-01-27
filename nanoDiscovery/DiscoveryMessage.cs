@@ -31,7 +31,7 @@ namespace nanoDiscovery
             else
             {
                 ip = ipAddress.GetAddressBytes();
-                ret = new byte[Header.Length + 1 + 1 + 1 + ip.Length + payload.Length];
+                ret = new byte[Header.Length + 1 + 1 + 1 + ip.Length + (payload != null ? payload.Length : 0)];
             }
 
             Header.CopyTo(ret, 0);

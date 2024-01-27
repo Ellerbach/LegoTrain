@@ -15,7 +15,8 @@ namespace LegoElement.Models
 
         private const string FileName = "I:\\config.json";
         private int _deviceId = -1;
-        private string _deviceType = string.Empty;
+        private bool _signalActivated = false;
+        private bool _switchActivated = false;
         private int _minPulse = -1;
         private int _maxPulse = -1;
         private int _servoPin = -1;
@@ -63,35 +64,18 @@ namespace LegoElement.Models
             }
         }
 
-        public string DeviceType
+        public bool SwitchActivated
         {
-            get => _deviceType;
+            get => _switchActivated;
             set
             {
-                if (_deviceType == value)
+                if (_switchActivated == value)
                 {
                     return;
                 }
 
-                string deviceType = value.ToLower();
-                if (deviceType == Signal.ToLower())
-                {
-                    _deviceType = Signal;
-                }
-                else if (deviceType == Switch.ToLower())
-                {
-                    _deviceType = Switch;
-                }
-                else if (deviceType == Both.ToLower())
-                {
-                    _deviceType = Both;
-                }
-                else
-                {    // Not valid
-                    return;
-                }
-
-                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(DeviceType)));
+                _switchActivated = value;
+                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(SwitchActivated)));
             }
         }
 
@@ -137,6 +121,22 @@ namespace LegoElement.Models
 
                 _servoPin = value;
                 OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(ServoGpio)));
+            }
+        }
+
+
+        public bool SignalActivated
+        {
+            get => _signalActivated;
+            set
+            {
+                if (_signalActivated == value)
+                {
+                    return;
+                }
+
+                _signalActivated = value;
+                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(SignalActivated)));
             }
         }
 

@@ -35,7 +35,7 @@ function swclicked(boxMSG, cmdSend) {
 //request signal change
 function siclicked(boxMSG, cmdSend) {
     var xhr = new XMLHttpRequest(); var mycmd = cmdSend + '&md=';
-    if (boxMSG.src.indexOf('signal-green.png') >= 0) mycmd += '2'; else mycmd += '1';
+    if (boxMSG.src.indexOf('signal-green.png') >= 0) mycmd += '1'; else mycmd += '2';
     xhr.open('GET', 'api/signal?' + mycmd + '&_=' + Math.random());
     xhr.send(null); xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
@@ -65,7 +65,7 @@ function getswitches() {
 //signals
 function buildSignal(boxMSG, num) {
     var obj = document.getElementById(boxMSG);
-    if (num == 1) obj.src = 'config/signal-green.png'; else if (num == 2) obj.src = 'config/signal-red.png'; else obj.src = 'config/signal-black.png';
+    if (num == 2) obj.src = 'config/signal-green.png'; else if (num == 1) obj.src = 'config/signal-red.png'; else obj.src = 'config/signal-black.png';
 }
 var NumberSignal = 16;
 function getsignals() {

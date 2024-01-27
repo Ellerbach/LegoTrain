@@ -23,7 +23,7 @@ namespace LegoTrain.Controllers
 
             foreach (var device in _configuration.Signals)
             {
-                if (_configuration.Discovery.DeviceDetails.ContainsKey(device.Id)
+                if ((_configuration.Discovery.DeviceDetails.Where(m=> m.Id == device.Id).FirstOrDefault() != null)
                     && _configuration.Discovery.DeviceDetails[device.Id].DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Signal))
                 {
                     device.IPAddress = _configuration.Discovery.DeviceDetails[device.Id].IPAddress.ToString();
@@ -36,7 +36,22 @@ namespace LegoTrain.Controllers
                 }
             }
 
-            if (_configuration.Discovery.DeviceDetails.ContainsKey(LegoInfraredExecutor.DeviceIDType) &&
+            foreach (var device in _configuration.Switches)
+            {
+                if ((_configuration.Discovery.DeviceDetails.Where(m => m.Id == device.Id).FirstOrDefault() != null)
+                    && _configuration.Discovery.DeviceDetails[device.Id].DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Switch))
+                {
+                    device.IPAddress = _configuration.Discovery.DeviceDetails[device.Id].IPAddress.ToString();
+                    device.IsConnected = _configuration.Discovery.DeviceDetails[device.Id].DeviceStatus == Models.Device.DeviceStatus.Joining;
+                }
+                else
+                {
+                    device.IPAddress = string.Empty;
+                    device.IsConnected = false;
+                }
+            }
+
+            if (_configuration.Discovery.DeviceDetails.Where(m => m.Id == LegoInfraredExecutor.DeviceIDType).FirstOrDefault() != null &&
                 _configuration.Discovery.DeviceDetails[LegoInfraredExecutor.DeviceIDType].DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Infrared))
             {
                 _configuration.Infrared.IPAddress = _configuration.Discovery.DeviceDetails[LegoInfraredExecutor.DeviceIDType].IPAddress.ToString();

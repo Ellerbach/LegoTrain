@@ -10,7 +10,7 @@ namespace SharedServices.Services
     public class Blinky : IDisposable
     {
         private readonly GpioController _gpio;
-        private readonly GpioPin _ledPin;
+        private GpioPin _ledPin;
         private CancellationTokenSource _csToken;
         private Thread _thread;
 
@@ -31,6 +31,7 @@ namespace SharedServices.Services
         {
             ResetToken();
             _ledPin?.Dispose();
+            _ledPin = null;
             _gpio?.Dispose();
         }
 
@@ -46,6 +47,11 @@ namespace SharedServices.Services
             {
                 while (!_csToken.IsCancellationRequested)
                 {
+                    if (_ledPin == null)
+                    {
+                        return;
+                    }
+
                     _ledPin.Toggle();
                     _csToken.Token.WaitHandle.WaitOne(millisec, true);
                 }
@@ -60,7 +66,7 @@ namespace SharedServices.Services
                 _csToken.Cancel();
             }
 
-            if(_thread!=null)
+            if (_thread != null)
             {
                 _thread.Join(1000);
             }

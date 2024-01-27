@@ -8,25 +8,21 @@ using System.Threading;
 using System.Net.Sockets;
 using System.Diagnostics;
 using nanoDiscovery;
+using nanoDiscovery.Common;
 
 namespace SharedServices.Services
 {
     public class LegoDiscovery : IDisposable
     {
-        public const string Signal = ":SI";
-        public const string Switch = ":SW";
-        public const string Both = ":SW:SI";
-        public const string Infrared = ":IR";
-
         private const int BindingPort = 2024;
         private UdpClient _udpClient;
         private IPAddress _ipAddress;
-        private string _capabilities;
+        private DeviceCapability _capabilities;
         private int _deviceId;
         private CancellationTokenSource _tokenSource;
         private Thread _runner;
 
-        public LegoDiscovery(IPAddress ipaddess, int deviceId, string capabilities)
+        public LegoDiscovery(IPAddress ipaddess, int deviceId, DeviceCapability capabilities)
         {
             _udpClient = new UdpClient();
             _ipAddress = ipaddess;
@@ -95,17 +91,12 @@ namespace SharedServices.Services
 
         public void Stop() => _tokenSource?.Cancel();
 
-        public void SendCapabilities(IPAddress ip = default)
+        public void SendCapabilities(IPAddress ip)
         {
             try
             {
-                string capabilities = $"{_capabilities.TrimStart(':')}";
-                var payload = Encoding.UTF8.GetBytes(capabilities);
+                var payload = new byte[] { (byte)_capabilities };
                 var data = DiscoveryMessage.CreateMessage(DiscoveryMessageType.Capabilities, (sbyte)_deviceId, _ipAddress, payload);
-                if(ip == default)
-                {
-                    ip = IPAddress.Parse("255.255.255.255");
-                }
 
                 _udpClient.Send(data, 0, data.Length, new IPEndPoint(ip, BindingPort));
             }

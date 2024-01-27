@@ -2,6 +2,7 @@ using LegoElement.Controllers;
 using LegoElement.Models;
 using LegoElement.Services;
 using LegoInfrared;
+using nanoDiscovery.Common;
 using nanoFramework.Hardware.Esp32;
 using nanoFramework.WebServer;
 using SharedServices.Controllers;
@@ -28,13 +29,16 @@ namespace LegoElement
 
         public static void Main()
         {
-            Console.WriteLine("Lego Infrared REST API");
+            Debug.WriteLine("Lego Infrared REST API");
 
             _appConfiguration = AppConfiguration.Load();
             if (AppConfiguration == null)
             {
                 _appConfiguration = new AppConfiguration();
                 _appConfiguration.LedGpio = 8;
+                _appConfiguration.SpiClock = 4;
+                _appConfiguration.SpiMosi = 6;
+                _appConfiguration.SpiMiso = 5;                
                 _appConfiguration.Save();
             }
 
@@ -56,7 +60,7 @@ namespace LegoElement
             }
 
 
-            Console.WriteLine($"Connected with wifi credentials. IP Address: {(_wifiApMode ? WirelessAP.GetIP() : Wireless80211.GetCurrentIPAddress())}");
+            Debug.WriteLine($"Connected with wifi credentials. IP Address: {(_wifiApMode ? WirelessAP.GetIP() : Wireless80211.GetCurrentIPAddress())}");
             _server = new WebServer(80, HttpProtocol.Http, new Type[] { typeof(ApiController), typeof(ConfigurationController) });
             // Add a handler for commands that are received by the server.
             _server.CommandReceived += ServerCommandReceived;
@@ -139,7 +143,7 @@ namespace LegoElement
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Invalid LegoInfrared configuration: {e.Message}");
+                    Debug.WriteLine($"Invalid LegoInfrared configuration: {e.Message}");
                 }
             }
             
@@ -155,10 +159,10 @@ namespace LegoElement
             _legoDiscovery?.Dispose();
             // Device ID is 0 for the infrared module, you can and should only have 1 to avoid interference
             // It is anyway something easy to add later on.
-            _legoDiscovery = new LegoDiscovery(IPAddress.Parse(Wireless80211.GetCurrentIPAddress()), 0, LegoDiscovery.Infrared);
+            _legoDiscovery = new LegoDiscovery(IPAddress.Parse(Wireless80211.GetCurrentIPAddress()), 0, DeviceCapability.Infrared);
             _legoDiscoToken?.Dispose();
             _legoDiscoToken = new CancellationTokenSource();
-            _legoDiscovery.SendCapabilities();
+            _legoDiscovery.SendCapabilities(IPAddress.Parse("255.255.255.255"));
             _legoDiscovery.Run(_legoDiscoToken.Token);
         }
     }
