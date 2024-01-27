@@ -18,7 +18,6 @@ namespace SharedServices.Services
             return !string.IsNullOrEmpty(wconf.Ssid);
         }
 
-
         /// <summary>
         /// Get current IP address. Only valid if successfully provisioned and connected
         /// </summary>

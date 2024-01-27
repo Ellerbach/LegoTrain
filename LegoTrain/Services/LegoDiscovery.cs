@@ -11,19 +11,15 @@ namespace LegoTrain.Services
 {
     public class LegoDiscovery : IDisposable
     {
-        public const string Signal = ":SI";
-        public const string Switch = ":SW";
-        public const string Both = ":SW:SI";
-        public const string Infrared = ":IR";
         private const int BindingPort = 2024;
         private UdpClient _udpClient;
         private Thread _runDiscovery;
         private CancellationTokenSource _runDiscoToken;
         private Thread _runReceive;
         private CancellationTokenSource _runReceiveToken;
-        private Dictionary<int, DeviceDetails> _deviceDetails = new Dictionary<int, DeviceDetails>();
+        private List<DeviceDetails> _deviceDetails = new List<DeviceDetails>();
 
-        public Dictionary<int, DeviceDetails> DeviceDetails => _deviceDetails;
+        public List<DeviceDetails> DeviceDetails => _deviceDetails;
 
         public LegoDiscovery(TimeSpan update = default)
         {
@@ -44,11 +40,11 @@ namespace LegoTrain.Services
                     // We ask for a ping to check that everything is still present every minute
                     Thread.Sleep((int)update.TotalMilliseconds);
                     // Check if we do have devices left for more than 3 updates
-                    foreach (var device in _deviceDetails.Values)
+                    foreach (var device in _deviceDetails)
                     {
                         if (device.LastUpdate > DateTimeOffset.UtcNow.AddMilliseconds(-update.TotalMilliseconds * 3))
                         {
-                            _deviceDetails.Remove(device.Id);
+                            _deviceDetails.Remove(device);
                             device.DeviceStatus = DeviceStatus.Absent;
                             // TODO: Send event
                         }
@@ -79,7 +75,7 @@ namespace LegoTrain.Services
                         DeviceDetails oldDevDeatils = null!;
 
                         devDetails.Id = id;
-                        if (_deviceDetails.ContainsKey(devDetails.Id))
+                        if (_deviceDetails.Where(m => m.Id == devDetails.Id).Any())
                         {
                             oldDevDeatils = _deviceDetails[devDetails.Id];
                         }
@@ -88,7 +84,7 @@ namespace LegoTrain.Services
                         {
                             if (oldDevDeatils != null)
                             {
-                                _deviceDetails.Remove(oldDevDeatils.Id);
+                                _deviceDetails.Remove(oldDevDeatils);
                                 // TODO: notify with event
                                 oldDevDeatils.DeviceStatus = DeviceStatus.Laaving;
                                 oldDevDeatils.LastUpdate = DateTimeOffset.UtcNow;
@@ -100,26 +96,9 @@ namespace LegoTrain.Services
                         devDetails.IPAddress = ip;
 
                         // Now check how many capabilities
-                        if (payload != null)
+                        if (payload != null && payload.Length > 0)
                         {
-                            var capabilities = Encoding.UTF8.GetString(payload).Split(":");
-                            foreach(var capa in capabilities)
-                            {
-                                switch (capa)
-                                {
-                                    case "IR":
-                                        devDetails.DeviceCapacity |= DeviceCapability.Infrared;
-                                        break;
-                                    case "SW":
-                                        devDetails.DeviceCapacity |= DeviceCapability.Switch;
-                                        break;
-                                    case "SI":
-                                        devDetails.DeviceCapacity |= DeviceCapability.Signal;
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
+                            devDetails.DeviceCapacity = (DeviceCapability)payload[0];                            
                         }
 
                         // Check if we already have one
@@ -136,7 +115,8 @@ namespace LegoTrain.Services
                         else
                         {
                             // TODO Send notification
-                            _deviceDetails.Add(id, devDetails);
+                            devDetails.LastUpdate = DateTimeOffset.UtcNow;
+                            _deviceDetails.Add(devDetails);
                         }
                     }
                     catch (Exception ex)

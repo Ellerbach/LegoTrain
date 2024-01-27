@@ -11,11 +11,15 @@ namespace LegoElement.Models
     {
         private readonly ServoMotor _servoMotor;
         private bool _isStraight = false;
+        private int _minPulse;
+        private int _maxPulse;
 
         public Switch(int pinServo, int minPulse, int maxPulse)
         {
             PwmChannel pwm = PwmChannel.CreateFromPin(pinServo, frequency: 50);
             _servoMotor = new ServoMotor(pwm, 180, minPulse, maxPulse);
+            _minPulse = minPulse;
+            _maxPulse = maxPulse;
             _servoMotor.Start();
             SetStraight();
         }
@@ -23,13 +27,13 @@ namespace LegoElement.Models
         public void SetStraight()
         {
             _isStraight = true;
-            _servoMotor.WriteAngle(0);
+            _servoMotor.WritePulseWidth(_minPulse);
         }
 
         public void SetTurn()
         {
             _isStraight = false;
-            _servoMotor.WriteAngle(180);
+            _servoMotor.WritePulseWidth(_maxPulse);
         }
 
         public bool IsStraight { get => _isStraight; }

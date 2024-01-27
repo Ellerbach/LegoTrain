@@ -25,7 +25,8 @@ namespace SharedServices.Controllers
             string route = "<!DOCTYPE html><html><head><title>Configuration</title></head><body><fieldset><legend>Configuration</legend><form action=\"/process\" method=\"post\">";
             e.Context.Response.ContentType = "text/html";
             // It's the moment to create a new configuration
-            
+
+            string hiddenBool = "<input type=\"hidden\" name=\"bool\" value=\"";
             var methods = AppConfiguration.GetType().GetMethods();
             foreach (MethodInfo method in methods)
             {
@@ -37,18 +38,23 @@ namespace SharedServices.Controllers
                     switch (paramType.FullName)
                     {
                         case "System.Int32":
-                            type = "number";
+                            type = $"number\" value=\"{method.Invoke(AppConfiguration, null)}";
+                            break;
+                        case "System.Boolean":
+                            var ret = method.Invoke(AppConfiguration, null);
+                            type = $"checkbox\" {((bool)ret ? $"checked=\"" : string.Empty)}";
+                            hiddenBool += $"{name}={ret};";
                             break;
                         default:
-                            type = "input";
+                            type = $"input\" value=\"{method.Invoke(AppConfiguration, null)}";
                             if (name.Contains("Password"))
                             {
-                                type = "password";
+                                type = $"password\" value=\"{method.Invoke(AppConfiguration, null)}";
                             }
                             break;
                     }
 
-                    route += $"<label for=\"{name}\">{name}:</label><input type=\"{type}\" id=\"{name}\" name=\"{name}\" value=\"{method.Invoke(AppConfiguration, null)}\"><br>";
+                    route += $"<label for=\"{name}\">{name}:</label><input name=\"{name}\" type=\"{type}\"/><br>";
                 }
             }
 
@@ -56,7 +62,9 @@ namespace SharedServices.Controllers
             //methods = null;
             //nanoFramework.Runtime.Native.GC.Run(true);
 
-            route += "<input type=\"submit\" value=\"Submit\"></form></fieldset><br>Note:<li>For the device type use 'Signal' or 'Switch' or 'Both'.</li><li>Leave unused settings to -1</li><li>Device ID should start at 1.</li>.</body></html>";
+            hiddenBool += hiddenBool.TrimEnd(';') + "\"/>";
+            route += hiddenBool;
+            route += "<input type=\"submit\" value=\"Submit\"></form></fieldset><br>Device ID should start at 1.</body></html>";
             WebServer.OutPutStream(e.Context.Response, route);
         }
 
@@ -70,7 +78,40 @@ namespace SharedServices.Controllers
 
             // We're adding back the question mark as it's not present when posting
             var parameters = WebServer.DecodeParam($"{WebServer.ParamStart}{paramString}");
-            // It's the moment to create a new configuration
+            // Let's keep track of our bools
+            string[] bools = new string[0];
+            foreach (UrlParameter param in parameters)
+            {
+                if (param.Name == "bool")
+                {
+                    bools = HttpUtility.UrlDecode(param.Value).Split(';');
+                }
+            }
+
+            foreach (string elem in bools)
+            {
+                var keyVal = elem.Split('=');
+                if (keyVal[1].ToLower() == "true")
+                {
+                    bool found = false;
+                    foreach (UrlParameter param in parameters)
+                    {
+                        if (keyVal[0] == param.Name)
+                        {
+                            found = true;
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        var memberPropSetMethod = AppConfiguration.GetType().GetMethod("set_" + keyVal[0]);
+                        if (memberPropSetMethod != null)
+                        {
+                            memberPropSetMethod.Invoke(AppConfiguration, new object[] { false });
+                        }
+                    }
+                }
+            }
 
             foreach (UrlParameter param in parameters)
             {
@@ -81,12 +122,17 @@ namespace SharedServices.Controllers
                     switch (setter.ParameterType.FullName)
                     {
                         case "System.Int32":
-                            int val = int.Parse(param.Value);
-                            memberPropSetMethod.Invoke(AppConfiguration, new object[] { val });
+                            if (int.TryParse(param.Value, out int val))
+                            {
+                                memberPropSetMethod.Invoke(AppConfiguration, new object[] { val });
+                            }
                             break;
                         case "System.String":
-
                             memberPropSetMethod.Invoke(AppConfiguration, new object[] { HttpUtility.UrlDecode(param.Value) });
+                            break;
+                        case "System.Boolean":
+                            // The value is only sent when the checkbox is checked!
+                            memberPropSetMethod.Invoke(AppConfiguration, new object[] { true });
                             break;
                         default:
                             break;

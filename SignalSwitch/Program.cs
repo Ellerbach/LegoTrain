@@ -13,6 +13,7 @@ using System.Threading;
 using SharedServices.Controllers;
 using SharedServices.Services;
 using SignalSwitch;
+using nanoDiscovery.Common;
 
 namespace LegoElement
 {
@@ -41,20 +42,27 @@ namespace LegoElement
             {
                 _appConfiguration = new AppConfiguration();
                 _appConfiguration.LedGpio = 8;
+                _appConfiguration.SwitchActivated = false;
+                _appConfiguration.SwitchActivated = false;
+                _appConfiguration.ServoGpio = 7;
+                _appConfiguration.SignalGpioGreen = 9;
+                _appConfiguration.SignalGpioRed = 10;
+                _appConfiguration.ServoMinimumPulse = 1000;
+                _appConfiguration.ServoMaximumPulse = 2100;
                 _appConfiguration.Save();
             }
 
             ConfigurationController.AppConfiguration = _appConfiguration;
             SetSignal();
             SetSwitch();
-            
+
             _wifiApMode = Wireless80211.ConnectOrSetAp();
             _blinky = new Blinky(_appConfiguration.LedGpio);
 
             // If we are in normal mode, advertize the service
             if (!_wifiApMode)
             {
-                SetDiscovery();                
+                SetDiscovery();
                 _blinky.BlinkNormal();
             }
             else
@@ -62,10 +70,11 @@ namespace LegoElement
                 _blinky.BlinkWaiWifi();
             }
 
-            Console.WriteLine($"Connected with wifi credentials. IP Address: {(_wifiApMode ? WirelessAP.GetIP() : Wireless80211.GetCurrentIPAddress())}");
+            Debug.WriteLine($"Connected with wifi credentials. IP Address: {(_wifiApMode ? WirelessAP.GetIP() : Wireless80211.GetCurrentIPAddress())}");
             _server = new WebServer(80, HttpProtocol.Http, new Type[] { typeof(ApiController), typeof(ConfigurationController) });
             // Add a handler for commands that are received by the server.
             _server.CommandReceived += ServerCommandReceived;
+
 
             // Start the server.
             _server.Start();
@@ -83,11 +92,11 @@ namespace LegoElement
             {
                 SetSignal();
             }
-            else if (e.ParamName.StartsWith("Servo"))
+            else if (e.ParamName.StartsWith("Servo") || e.ParamName.StartsWith("Switch"))
             {
                 SetSwitch();
             }
-            else if(e.ParamName.StartsWith("Device"))
+            else if (e.ParamName.StartsWith("Device") || e.ParamName.EndsWith("Activated"))
             {
                 SetDiscovery();
             }
@@ -100,7 +109,7 @@ namespace LegoElement
 
         private static void SetSwitch()
         {
-            if (AppConfiguration.DeviceType == AppConfiguration.Switch || AppConfiguration.DeviceType == AppConfiguration.Both)
+            if (_appConfiguration.SwitchActivated)
             {
                 try
                 {
@@ -118,14 +127,14 @@ namespace LegoElement
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Invalid LegoInfrared configuration: {ex.Message}");
+                    Debug.WriteLine($"Invalid Switch configuration: {ex.Message}");
                 }
             }
         }
 
         private static void SetSignal()
         {
-            if (AppConfiguration.DeviceType == AppConfiguration.Signal || AppConfiguration.DeviceType == AppConfiguration.Both)
+            if (_appConfiguration.SignalActivated)
             {
                 try
                 {
@@ -138,7 +147,7 @@ namespace LegoElement
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Invalid LegoInfrared configuration: {ex.Message}");
+                    Console.WriteLine($"Invalid Signal configuration: {ex.Message}");
                 }
             }
         }
@@ -147,20 +156,16 @@ namespace LegoElement
         {
             Debug.WriteLine("Starting discovery service");
             // We strart the discovery service
-            string capacities = string.Empty;
-            switch (_appConfiguration.DeviceType)
+
+            DeviceCapability capacities = DeviceCapability.None;
+            if (_appConfiguration.SignalActivated)
             {
-                case AppConfiguration.Both:
-                    capacities = LegoDiscovery.Both;
-                    break;
-                case AppConfiguration.Signal:
-                    capacities = LegoDiscovery.Signal;
-                    break;
-                case AppConfiguration.Switch:
-                    capacities = LegoDiscovery.Switch;
-                    break;
-                default:
-                    break;
+                capacities |= DeviceCapability.Signal;
+            }
+
+            if (_appConfiguration.SwitchActivated)
+            {
+                capacities |= DeviceCapability.Switch;
             }
 
             _legoDiscoToken?.Cancel();
@@ -168,7 +173,7 @@ namespace LegoElement
             _legoDiscovery = new LegoDiscovery(IPAddress.Parse(Wireless80211.GetCurrentIPAddress()), _appConfiguration.DeviceId, capacities);
             _legoDiscoToken?.Dispose();
             _legoDiscoToken = new CancellationTokenSource();
-            _legoDiscovery.SendCapabilities();
+            _legoDiscovery.SendCapabilities(IPAddress.Parse("255.255.255.255"));
             _legoDiscovery.Run(_legoDiscoToken.Token);
         }
 
@@ -197,26 +202,24 @@ namespace LegoElement
             else
             {
                 string toOutput = "<html><head><title>Lego Signal/Switch</title></head><body>";
-                if (AppConfiguration.DeviceType == AppConfiguration.Signal || AppConfiguration.DeviceType == AppConfiguration.Both)
+                if (AppConfiguration.SignalActivated)
                 {
                     toOutput += $"Your Signal configuration is <b>{(Signal == null ? "incorrect" : "valid")}</b>.<br/>";
                 }
 
-                if (AppConfiguration.DeviceType == AppConfiguration.Switch || AppConfiguration.DeviceType == AppConfiguration.Both)
+                if (AppConfiguration.SwitchActivated)
                 {
                     toOutput += $"Your Switch configuration is <b>{(Switch == null ? "incorrect" : "valid")}</b>.<br/>";
                 }
 
-                if ((AppConfiguration.DeviceType != AppConfiguration.Signal) &&
-                    (AppConfiguration.DeviceType != AppConfiguration.Both) &&
-                    (AppConfiguration.DeviceType != AppConfiguration.Switch))
+                if (!AppConfiguration.SignalActivated && !AppConfiguration.SwitchActivated)
                 {
                     toOutput += "You haven't set a proper device type. Go to <a href=\"/config\">configuration</a><br/>";
                 }
                 else
                 {
-                    toOutput += $"Your device is properly set as {(AppConfiguration.DeviceType != AppConfiguration.Both ? AppConfiguration.DeviceType : "both Signal and Switch.<br/>")}";
-                    toOutput += $"Your device ID is {(AppConfiguration.DeviceId < 0 ? "invalid, it must be positive or zero." : AppConfiguration.DeviceId)}.<br>";
+                    toOutput += $"Your device is properly set as {(AppConfiguration.SignalActivated && AppConfiguration.SwitchActivated ? "both Signal and Switch.": (AppConfiguration.SignalActivated ? "signal." : "swith"))}<br/>";
+                    toOutput += $"Your device ID is {(AppConfiguration.DeviceId < 0 ? "invalid, it must be more or equal to 1." : AppConfiguration.DeviceId)}.<br>";
                 }
 
                 toOutput += "To configure your device please go to <a href=\"/config\">configuration</a>.<br/>";

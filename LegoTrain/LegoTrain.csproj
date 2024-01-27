@@ -60,4 +60,6 @@
 
   <Import Project="..\nanoDiscovery\nanoDiscovery.projitems" Label="Shared" />
 
+  <Import Project="..\LegoDiscoveryCommon\LegoDiscoveryCommon.projitems" Label="Shared" />
+
 </Project>

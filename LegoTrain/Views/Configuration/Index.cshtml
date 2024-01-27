@@ -29,6 +29,9 @@
                 }
             }
         </div>
+    </dl>
+    <hr />
+    <dl class="row">
         <div>
             Signal configuration seems
             @{
@@ -76,6 +79,9 @@
                 }
             }
         </div>
+    </dl>
+    <hr />
+    <dl class="row">
         <div>
             Switch configuration seems
             @{
@@ -123,6 +129,57 @@
                         </table>
                     }
                 }
+            }
+        </div>
+    </dl>
+    <hr />
+    <dl class="row">
+        <div>
+            @if (Model.Discovery.DeviceDetails.Count > 0)
+            {
+                <div>Here is the list of all your devices and capacities:</div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.Id)</th>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.IPAddress)</th>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.DeviceStatus)</th>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.DeviceCapacity)</th>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.LastUpdate)</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var device in Model.Discovery.DeviceDetails)
+                        {
+                            string separation = " | ";
+                            <tr>
+                                <td>@Html.DisplayFor(modelitem => device.Value.Id)</td>
+                                <td>@Html.DisplayFor(modelitem => device.Value.IPAddress)</td>
+                                <td>@Html.DisplayFor(modelitem => device.Value.DeviceStatus)</td>
+                                <td>@Html.DisplayFor(modelitem => device.Value.DeviceCapacity)</td>
+                                <td>@Html.DisplayFor(modelitem => device.Value.LastUpdate)</td>
+                                <td>
+                                    <a href="http://@device.Value.IPAddress">Configure</a>
+                                    @if ((device.Value.DeviceCapacity.HasFlag(LegoTrain.Models.Device.DeviceCapability.Switch) && !(Model.Switches.Where(m => m.Id == device.Value.Id).Any())))
+                                    {
+                                        @separation
+                                        @Html.ActionLink("Create Switch", "Create", "Switch")
+                                    }
+                                    @if ((device.Value.DeviceCapacity.HasFlag(LegoTrain.Models.Device.DeviceCapability.Signal)) && !(Model.Signals.Where(m => m.Id == device.Value.Id).Any()))
+                                    {
+                                        @separation
+                                        @Html.ActionLink("Create Signal", "Create", "Signal")
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div>There is no device currently connected. Connect devices and refresh this page.</div>
             }
         </div>
     </dl>

@@ -101,7 +101,6 @@ namespace LegoElement.Controllers
             }
 
             WebServer.OutputHttpCode(e.Context.Response, HttpStatusCode.OK);
-            return;
         }
 
 
