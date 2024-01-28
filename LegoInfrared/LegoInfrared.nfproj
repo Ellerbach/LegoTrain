@@ -31,7 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Iot.Device.DhcpServer">
-      <HintPath>..\packages\nanoFramework.Iot.Device.DhcpServer.1.2.443\lib\Iot.Device.DhcpServer.dll</HintPath>
+      <HintPath>..\packages\nanoFramework.Iot.Device.DhcpServer.1.2.450\lib\Iot.Device.DhcpServer.dll</HintPath>
     </Reference>
     <Reference Include="Lego.Infrared.nanoFramework">
       <HintPath>..\packages\LegoInfrared.nanoFramework.0.3.0\lib\Lego.Infrared.nanoFramework.dll</HintPath>
@@ -107,13 +107,13 @@
     </ProjectCapabilities>
   </ProjectExtensions>
   <ItemGroup>
+    <Content Include="Resources\favicon.ico" />
+    <Content Include="Resources\style.css" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="ResourceWeb.resx">
       <Generator>nFResXFileCodeGenerator</Generator>
       <LastGenOutput>ResourceWeb.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\favicon.ico" />
-    <Content Include="Resources\style.css" />
   </ItemGroup>
 </Project>

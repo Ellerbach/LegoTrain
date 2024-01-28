@@ -17,7 +17,7 @@ namespace SharedServices.Services
         {
             if (e.Context.Request.HttpMethod == "GET")
             {
-                string route = $"<!DOCTYPE html><html<head><title>Configuration Page</title><link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\"></head><body>" +
+                string route = $"<!DOCTYPE html><html<head><title>Configuration Page</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>" +
                     "<h1>NanoFramework</h1>" +
                     "<form method='POST'  action='/'>" +
                     "<fieldset><legend>Wireless configuration</legend>" +
@@ -56,7 +56,7 @@ namespace SharedServices.Services
                 // Enable the Wireless station interface
                 bool res = Wireless80211.Configure(ssid, password);
 
-                var route = $"<!DOCTYPE html><html><body>" +
+                var route = $"<!DOCTYPE html><html><head><title>WiFi configured</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>" +
                     "<h1>NanoFramework</h1>" +
                     "<p>New settings saved.</p><p>Rebooting device to put into normal mode.</p>" +
                     "<p>Please allow up to 10 seconds to reconnect to the IP address.</p>";

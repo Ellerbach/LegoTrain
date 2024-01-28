@@ -2,10 +2,9 @@
 // Laurent Ellerbach licenses this file to you under the MIT license.
 
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
 using LegoTrain.Models;
-using LegoTrain.Services;
 using Lego.Infrared;
+using nanoDiscovery.Common;
 
 namespace LegoTrain.Controllers
 {
@@ -101,8 +100,8 @@ namespace LegoTrain.Controllers
                 return BadRequest();
             }
 
-            Speed[] mComboBlue = new Speed[4] { bl0, bl1, bl2, bl3 };
-            Speed[] mComboRed = new Speed[4] { rd0, rd1, rd2, rd3 };
+            Speed[] mComboBlue = [bl0, bl1, bl2, bl3];
+            Speed[] mComboRed = [rd0, rd1, rd2, rd3];
             var res = _config.LegoInfraredExecutor.ComboAll(mComboBlue, mComboRed);
             return res ? Ok() : BadRequest();
         }
@@ -115,8 +114,8 @@ namespace LegoTrain.Controllers
                 return BadRequest();
             }
 
-            Function[] mFunction = new Function[4] { fc0, fc1, fc2, fc3 };
-            Output[] mOutPut = new Output[4] { op0, op1, op2, op3 };
+            Function[] mFunction = [fc0, fc1, fc2, fc3];
+            Output[] mOutPut = [op0, op1, op2, op3];
             var res = _config.LegoInfraredExecutor.ContinuousAll(mFunction, mOutPut);
             return res ? Ok() : BadRequest();
         }
@@ -129,8 +128,8 @@ namespace LegoTrain.Controllers
                 return BadRequest();
             }
 
-            PwmSpeed[] mPWM = new PwmSpeed[4] { pw0, pw1, pw2, pw3 };
-            PwmOutput[] mOutPut = new PwmOutput[4] { op0, op1, op2, op3 };
+            PwmSpeed[] mPWM = [pw0, pw1, pw2, pw3];
+            PwmOutput[] mOutPut = [op0, op1, op2, op3];
             var res = _config.LegoInfraredExecutor.SinglePwmAll(mPWM, mOutPut);
             return res ? Ok() : BadRequest();
         }
@@ -143,8 +142,8 @@ namespace LegoTrain.Controllers
                 return BadRequest();
             }
 
-            PwmSpeed[] mPWMR = new PwmSpeed[4] { pwr0, pwr1, pwr2, pwr3 };
-            PwmSpeed[] mPWMB = new PwmSpeed[4] { pwb0, pwb1, pwb2, pwb3 };
+            PwmSpeed[] mPWMR = [pwr0, pwr1, pwr2, pwr3];
+            PwmSpeed[] mPWMB = [pwb0, pwb1, pwb2, pwb3];
             var res = _config.LegoInfraredExecutor.ComboPwmAll(mPWMR, mPWMB);
             return res ? Ok() : BadRequest();
         }
@@ -191,9 +190,9 @@ namespace LegoTrain.Controllers
             string strResp = string.Empty;
             foreach (var device in _config.Discovery.DeviceDetails)
             {
-                if (device.Value.DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Signal))
+                if (device.DeviceCapacity.HasFlag(DeviceCapability.Signal))
                 {
-                    strResp += $"{device.Key}={(int)_config.SignalManagement.GetSignal((byte)device.Key)};";
+                    strResp += $"{device.Id}={(int)_config.SignalManagement.GetSignal((byte)device.Id)};";
                 }
             }
 
@@ -211,9 +210,9 @@ namespace LegoTrain.Controllers
             string strResp = string.Empty;
             foreach (var device in _config.Discovery.DeviceDetails)
             {
-                if (device.Value.DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Switch))
+                if (device.DeviceCapacity.HasFlag(DeviceCapability.Switch))
                 {
-                    strResp += $"{device.Key}={(_config.SwitchManagement.GetSwitch((byte)device.Key) ? "1" : "0")};";
+                    strResp += $"{device.Id}={(_config.SwitchManagement.GetSwitch((byte)device.Id) ? "1" : "0")};";
                 }
             }
 

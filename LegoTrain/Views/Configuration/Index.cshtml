@@ -141,11 +141,11 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.Id)</th>
-                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.IPAddress)</th>
-                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.DeviceStatus)</th>
-                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.DeviceCapacity)</th>
-                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Value.LastUpdate)</th>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().Id)</th>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().IPAddress)</th>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().DeviceStatus)</th>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().DeviceCapacity)</th>
+                            <th>@Html.DisplayNameFor(model => model.Discovery.DeviceDetails.FirstOrDefault().LastUpdate)</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -154,19 +154,19 @@
                         {
                             string separation = " | ";
                             <tr>
-                                <td>@Html.DisplayFor(modelitem => device.Value.Id)</td>
-                                <td>@Html.DisplayFor(modelitem => device.Value.IPAddress)</td>
-                                <td>@Html.DisplayFor(modelitem => device.Value.DeviceStatus)</td>
-                                <td>@Html.DisplayFor(modelitem => device.Value.DeviceCapacity)</td>
-                                <td>@Html.DisplayFor(modelitem => device.Value.LastUpdate)</td>
+                                <td>@Html.DisplayFor(modelitem => device.Id)</td>
+                                <td>@Html.DisplayFor(modelitem => device.IPAddress)</td>
+                                <td>@Html.DisplayFor(modelitem => device.DeviceStatus)</td>
+                                <td>@Html.DisplayFor(modelitem => device.DeviceCapacity)</td>
+                                <td>@Html.DisplayFor(modelitem => device.LastUpdate)</td>
                                 <td>
-                                    <a href="http://@device.Value.IPAddress">Configure</a>
-                                    @if ((device.Value.DeviceCapacity.HasFlag(LegoTrain.Models.Device.DeviceCapability.Switch) && !(Model.Switches.Where(m => m.Id == device.Value.Id).Any())))
+                                    <a href="http://@device.IPAddress">Configure</a>
+                                    @if ((device.DeviceCapacity.HasFlag(nanoDiscovery.Common.DeviceCapability.Switch) && !(Model.Switches.Where(m => m.Id == device.Id).Any())))
                                     {
                                         @separation
                                         @Html.ActionLink("Create Switch", "Create", "Switch")
                                     }
-                                    @if ((device.Value.DeviceCapacity.HasFlag(LegoTrain.Models.Device.DeviceCapability.Signal)) && !(Model.Signals.Where(m => m.Id == device.Value.Id).Any()))
+                                    @if ((device.DeviceCapacity.HasFlag(nanoDiscovery.Common.DeviceCapability.Signal)) && !(Model.Signals.Where(m => m.Id == device.Id).Any()))
                                     {
                                         @separation
                                         @Html.ActionLink("Create Signal", "Create", "Signal")

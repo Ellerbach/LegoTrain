@@ -4,6 +4,8 @@
 using Microsoft.AspNetCore.Mvc;
 using LegoTrain.Models;
 using LegoTrain.Services;
+using nanoDiscovery.Common;
+using LegoTrain.Models.Device;
 
 namespace LegoTrain.Controllers
 {
@@ -23,11 +25,12 @@ namespace LegoTrain.Controllers
 
             foreach (var device in _configuration.Signals)
             {
-                if ((_configuration.Discovery.DeviceDetails.Where(m=> m.Id == device.Id).FirstOrDefault() != null)
-                    && _configuration.Discovery.DeviceDetails[device.Id].DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Signal))
+                var dev = _configuration.Discovery.DeviceDetails.Where(m => m.Id == device.Id).FirstOrDefault();
+                if ((dev != null)
+                    && dev.DeviceCapacity.HasFlag(DeviceCapability.Signal))
                 {
-                    device.IPAddress = _configuration.Discovery.DeviceDetails[device.Id].IPAddress.ToString();
-                    device.IsConnected = _configuration.Discovery.DeviceDetails[device.Id].DeviceStatus == Models.Device.DeviceStatus.Joining;
+                    device.IPAddress = dev.IPAddress.ToString();
+                    device.IsConnected = dev.DeviceStatus == DeviceStatus.Joining;
                 }
                 else
                 {
@@ -38,11 +41,12 @@ namespace LegoTrain.Controllers
 
             foreach (var device in _configuration.Switches)
             {
-                if ((_configuration.Discovery.DeviceDetails.Where(m => m.Id == device.Id).FirstOrDefault() != null)
-                    && _configuration.Discovery.DeviceDetails[device.Id].DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Switch))
+                var dev = _configuration.Discovery.DeviceDetails.Where(m => m.Id == device.Id).FirstOrDefault();
+                if ((dev != null)
+                    && dev.DeviceCapacity.HasFlag(DeviceCapability.Switch))
                 {
-                    device.IPAddress = _configuration.Discovery.DeviceDetails[device.Id].IPAddress.ToString();
-                    device.IsConnected = _configuration.Discovery.DeviceDetails[device.Id].DeviceStatus == Models.Device.DeviceStatus.Joining;
+                    device.IPAddress = dev.IPAddress.ToString();
+                    device.IsConnected = dev.DeviceStatus == DeviceStatus.Joining;
                 }
                 else
                 {
@@ -51,11 +55,12 @@ namespace LegoTrain.Controllers
                 }
             }
 
-            if (_configuration.Discovery.DeviceDetails.Where(m => m.Id == LegoInfraredExecutor.DeviceIDType).FirstOrDefault() != null &&
-                _configuration.Discovery.DeviceDetails[LegoInfraredExecutor.DeviceIDType].DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Infrared))
+            var devI = _configuration.Discovery.DeviceDetails.Where(m => m.Id == LegoInfraredExecutor.DeviceIDType).FirstOrDefault();
+            if ( devI!= null &&
+                devI.DeviceCapacity.HasFlag(DeviceCapability.Infrared))
             {
-                _configuration.Infrared.IPAddress = _configuration.Discovery.DeviceDetails[LegoInfraredExecutor.DeviceIDType].IPAddress.ToString();
-                _configuration.Infrared.IsConnected = _configuration.Discovery.DeviceDetails[LegoInfraredExecutor.DeviceIDType].DeviceStatus == Models.Device.DeviceStatus.Joining;
+                _configuration.Infrared.IPAddress = devI.IPAddress.ToString();
+                _configuration.Infrared.IsConnected = devI.DeviceStatus == DeviceStatus.Joining;
             }
             else
             {
@@ -64,6 +69,6 @@ namespace LegoTrain.Controllers
             }
 
             return View(_configuration);
-        }        
+        }
     }
 }

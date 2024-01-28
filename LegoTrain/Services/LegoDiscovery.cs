@@ -3,9 +3,9 @@
 
 using LegoTrain.Models.Device;
 using nanoDiscovery;
+using nanoDiscovery.Common;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace LegoTrain.Services
 {
@@ -40,13 +40,14 @@ namespace LegoTrain.Services
                     // We ask for a ping to check that everything is still present every minute
                     Thread.Sleep((int)update.TotalMilliseconds);
                     // Check if we do have devices left for more than 3 updates
-                    foreach (var device in _deviceDetails)
+                    for (int i =0; i< _deviceDetails.Count; i++)
                     {
-                        if (device.LastUpdate > DateTimeOffset.UtcNow.AddMilliseconds(-update.TotalMilliseconds * 3))
+                        if ((DateTimeOffset.UtcNow - _deviceDetails[i].LastUpdate).TotalMilliseconds > update.TotalMilliseconds * 3)
                         {
-                            _deviceDetails.Remove(device);
-                            device.DeviceStatus = DeviceStatus.Absent;
+                            _deviceDetails[i].DeviceStatus = DeviceStatus.Absent;
                             // TODO: Send event
+
+                            _deviceDetails.Remove(_deviceDetails[i]);
                         }
                     }
                 }
@@ -72,13 +73,10 @@ namespace LegoTrain.Services
                         }
 
                         var devDetails = new DeviceDetails();
-                        DeviceDetails oldDevDeatils = null!;
+                        DeviceDetails? oldDevDeatils;
 
                         devDetails.Id = id;
-                        if (_deviceDetails.Where(m => m.Id == devDetails.Id).Any())
-                        {
-                            oldDevDeatils = _deviceDetails[devDetails.Id];
-                        }
+                        oldDevDeatils = _deviceDetails.Where(m => m.Id == devDetails.Id).FirstOrDefault();
 
                         if (messageType == DiscoveryMessageType.Byebye)
                         {
@@ -108,6 +106,7 @@ namespace LegoTrain.Services
                             // Check if status is different than Joining
                             if ((oldDevDeatils.DeviceStatus != DeviceStatus.Joining) || (oldDevDeatils.DeviceCapacity != devDetails.DeviceCapacity))
                             {
+                                oldDevDeatils.DeviceCapacity = devDetails.DeviceCapacity;
                                 oldDevDeatils.DeviceStatus = DeviceStatus.Joining;
                                 // TODO Send notification
                             }

@@ -28,7 +28,7 @@ namespace LegoTrain.Services
         {
             try
             {
-                var ip = _disco.DeviceDetails[numSwitch].IPAddress.ToString();
+                var ip = _disco.DeviceDetails.Where(m => m.Id == numSwitch).First().IPAddress.ToString();
                 _client.GetAsync($"http://{ip}/switch?md={(value ? "1" : "0")}");
             }
             catch
@@ -37,12 +37,12 @@ namespace LegoTrain.Services
             }
         }
 
-        public bool GetSwitch(byte nNumSwitch)
+        public bool GetSwitch(byte numSwitch)
         {
             int state = 0;
             try
             {
-                var ip = _disco.DeviceDetails[nNumSwitch].IPAddress.ToString();
+                var ip = _disco.DeviceDetails.Where(m => m.Id == numSwitch).First().IPAddress.ToString();
                 var res = _client.GetAsync($"http://{ip}/switchstatus").GetAwaiter().GetResult();
 
                 if (res.StatusCode == System.Net.HttpStatusCode.OK)
