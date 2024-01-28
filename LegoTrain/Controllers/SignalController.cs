@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using LegoTrain.Models;
 using LegoTrain.Services;
 using Iot.Device.FtCommon;
+using LegoTrain.Models.Device;
+using nanoDiscovery.Common;
 
 namespace LegoTrain.Controllers
 {
@@ -22,11 +24,12 @@ namespace LegoTrain.Controllers
         {
             foreach (var device in _configuration.Signals)
             {
-                if (_configuration.Discovery.DeviceDetails.ContainsKey(device.Id) 
-                    && _configuration.Discovery.DeviceDetails[device.Id].DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Signal))
+                var dev = _configuration.Discovery.DeviceDetails.Where(m => m.Id == device.Id).FirstOrDefault();
+                if (dev != null
+                    && dev.DeviceCapacity.HasFlag(DeviceCapability.Signal))
                 {
-                    device.IPAddress = _configuration.Discovery.DeviceDetails[device.Id].IPAddress.ToString();
-                    device.IsConnected = _configuration.Discovery.DeviceDetails[device.Id].DeviceStatus == Models.Device.DeviceStatus.Joining;                   
+                    device.IPAddress = dev.IPAddress.ToString();
+                    device.IsConnected = dev.DeviceStatus == DeviceStatus.Joining;
                 }
                 else
                 {
@@ -47,11 +50,12 @@ namespace LegoTrain.Controllers
                 return NotFound();
             }
 
-            if (_configuration.Discovery.DeviceDetails.ContainsKey(id) && 
-                _configuration.Discovery.DeviceDetails[id].DeviceCapacity.HasFlag(Models.Device.DeviceCapability.Signal))
-            {                
-                sig.IPAddress = _configuration.Discovery.DeviceDetails[id].IPAddress.ToString();
-                sig.IsConnected = _configuration.Discovery.DeviceDetails[id].DeviceStatus == Models.Device.DeviceStatus.Joining;
+            var dev = _configuration.Discovery.DeviceDetails.Where(m => m.Id == id).FirstOrDefault();
+            if (dev != null &&
+                dev.DeviceCapacity.HasFlag(DeviceCapability.Signal))
+            {
+                sig.IPAddress = dev.IPAddress.ToString();
+                sig.IsConnected = dev.DeviceStatus == DeviceStatus.Joining;
             }
             else
             {

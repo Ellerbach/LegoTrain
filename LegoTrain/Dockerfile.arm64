@@ -1,5 +1,5 @@
 # Base image for ARM64
-FROM mcr.microsoft.com/dotnet/aspnet:7.0.14-bullseye-slim-arm64v8 AS base-arm64
+FROM mcr.microsoft.com/dotnet/aspnet:8.0.1-jammy-arm64v8 AS base-arm64
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443

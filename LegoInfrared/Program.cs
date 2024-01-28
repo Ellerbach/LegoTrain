@@ -26,6 +26,7 @@ namespace LegoElement
         private static LegoDiscovery _legoDiscovery;
         private static CancellationTokenSource _legoDiscoToken;
         private static Blinky _blinky;
+        private static int _tries = 0;
 
         public static void Main()
         {
@@ -38,7 +39,7 @@ namespace LegoElement
                 _appConfiguration.LedGpio = 8;
                 _appConfiguration.SpiClock = 4;
                 _appConfiguration.SpiMosi = 6;
-                _appConfiguration.SpiMiso = 5;                
+                _appConfiguration.SpiMiso = 5;
                 _appConfiguration.Save();
             }
 
@@ -64,7 +65,7 @@ namespace LegoElement
             _server = new WebServer(80, HttpProtocol.Http, new Type[] { typeof(ApiController), typeof(ConfigurationController) });
             // Add a handler for commands that are received by the server.
             _server.CommandReceived += ServerCommandReceived;
-
+            _server.WebServerStatusChanged += WebServerStatusChanged;
             // Start the server.
             _server.Start();
 
@@ -73,12 +74,30 @@ namespace LegoElement
             Thread.Sleep(Timeout.Infinite);
         }
 
+        private static void WebServerStatusChanged(object obj, WebServerStatusEventArgs e)
+        {
+            if (e.Status == WebServerStatus.Stopped)
+            {
+                if (_tries++ < 5)
+                {
+                    _server.Start();
+                }
+                else
+                {
+                    Sleep.EnableWakeupByTimer(new TimeSpan(0, 0, 0, 1));
+                    Sleep.StartDeepSleep();
+                }
+            }
+        }
+
         private static void OnConfigurationUpdated(object sender, ConfigurationEventArgs e)
         {
             Console.WriteLine($"Parameter updated: {e.ParamName}");
             if (e.ParamName.StartsWith("Spi"))
             {
-                SetLegoInfrared();
+                AppConfiguration.Save();
+                // We don't resetup
+                // SetLegoInfrared();
             }
             else
             {
@@ -89,19 +108,20 @@ namespace LegoElement
 
         private static void ServerCommandReceived(object obj, WebServerEventArgs e)
         {
-            // Not enough memeory
-            //if (e.Context.Request.RawUrl.StartsWith("/style.css"))
-            //{
-            //    e.Context.Response.ContentType = "text/css";
-            //    WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
-            //    return;
-            //}
+            if (e.Context.Request.RawUrl.StartsWith("/style.css"))
+            {
+                e.Context.Response.ContentType = "text/css";
+                WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
+                return;
+            }
             //else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
             //{
+            //    Debug.WriteLine("before favion.ico");
             //    var ico = ResourceWeb.GetBytes(ResourceWeb.BinaryResources.favicon);
             //    e.Context.Response.ContentType = "image/ico";
             //    e.Context.Response.ContentLength64 = ico.Length;
             //    e.Context.Response.OutputStream.Write(ico, 0, ico.Length);
+            //    Debug.WriteLine("After favion.ico");
             //    return;
             //}
 
@@ -112,7 +132,7 @@ namespace LegoElement
             else
             {
                 string toOutput = "<html><head>" +
-                    $"<title>Lego Infrared</title></head><body>" +
+                    $"<title>Lego Infrared</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>" +
                     $"Your Lego Infrared configuraiton is: {(LegoInfrared == null ? "Invalid" : "Valid")}<br/>";
                 toOutput += "To configure your device please go to <a href=\"config\">configuration</a><br/>";
                 toOutput += "Reset your wifi by cliking <a href=\"resetwifi\">here</a>.";
@@ -123,11 +143,12 @@ namespace LegoElement
 
         private static void SetLegoInfrared()
         {
-            if (_legoInfrared != null)
-            {
-                _legoInfrared?.Dispose();
-                _legoInfrared = null;
-            }
+            // Dispose is failing. Bug in nanoFramework
+            //if (_legoInfrared != null)
+            //{
+            //    _legoInfrared?.Dispose();
+            //    _legoInfrared = null;
+            //}
 
             // On an ESP32, setup first the pins for the SPI
             if ((AppConfiguration.SpiClock >= 0) &&
@@ -139,14 +160,16 @@ namespace LegoElement
                 Configuration.SetPinFunction(AppConfiguration.SpiMosi, DeviceFunction.SPI1_MOSI);
                 try
                 {
+                    Debug.WriteLine("Pre Infrared config");
                     _legoInfrared = new Lego.Infrared.LegoInfrared(1, AppConfiguration.SpiChipSelect);
+                    Debug.WriteLine("Post Infrared config");
                 }
                 catch (Exception e)
                 {
                     Debug.WriteLine($"Invalid LegoInfrared configuration: {e.Message}");
                 }
             }
-            
+
             LegoInfraredExecute.LegoInfrared = _legoInfrared;
         }
 

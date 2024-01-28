@@ -19,7 +19,7 @@ namespace LegoTrain.Services
         {
             try
             {
-                var ip = _disco.DeviceDetails[numSignal].IPAddress.ToString();
+                var ip = _disco.DeviceDetails.Where(m => m.Id  == numSignal).First().IPAddress.ToString();
                 _client.GetAsync($"http://{ip}/signal?md={(int)value}");
             }
             catch
@@ -33,7 +33,7 @@ namespace LegoTrain.Services
             int state = 0;
             try
             {
-                var ip = _disco.DeviceDetails[numSignal].IPAddress.ToString();
+                var ip = _disco.DeviceDetails.Where(m => m.Id == numSignal).First().IPAddress.ToString();
                 var res = _client.GetAsync($"http://{ip}/signalstatus").GetAwaiter().GetResult();
 
                 if (res.StatusCode == System.Net.HttpStatusCode.OK)

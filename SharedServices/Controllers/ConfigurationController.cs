@@ -8,6 +8,8 @@ using System.Web;
 using nanoFramework.Runtime;
 using SharedServices.Models;
 using SharedServices.Services;
+using nanoFramework.Hardware.Esp32;
+using System.Threading;
 
 namespace SharedServices.Controllers
 {
@@ -22,7 +24,7 @@ namespace SharedServices.Controllers
             //nanoFramework.Runtime.Native.GC.Run(true);
 
             // TODO: check the basic authentication
-            string route = "<!DOCTYPE html><html><head><title>Configuration</title></head><body><fieldset><legend>Configuration</legend><form action=\"/process\" method=\"post\">";
+            string route = "<!DOCTYPE html><html><head><title>Configuration</title><link rel=\"stylesheet\" href=\"style.css\"></head><body><fieldset><legend>Configuration</legend><form action=\"/process\" method=\"post\">";
             e.Context.Response.ContentType = "text/html";
             // It's the moment to create a new configuration
 
@@ -143,14 +145,14 @@ namespace SharedServices.Controllers
             // We need to clean things to get some memory
             nanoFramework.Runtime.Native.GC.Run(true);
             AppConfiguration.Save();
-            string route = $"<!DOCTYPE html><html><head><title>Configuration Page</title></head><body>Configuration saved and updated. Return to the <a href=\"http://{Wireless80211.GetCurrentIPAddress()}\">home page</a>.</body></html>";
+            string route = $"<!DOCTYPE html><html><head><title>Configuration Page</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>Configuration saved and updated. Return to the <a href=\"http://{Wireless80211.GetCurrentIPAddress()}\">home page</a>.</body></html>";
             WebServer.OutPutStream(e.Context.Response, route);
         }
 
         [Route("resetwifi")]
         public void ResetWifi(WebServerEventArgs e)
         {
-            string route = $"<!DOCTYPE html><html><head><title>Lego Infrared Wireless Configuration</title></head><body>" +
+            string route = $"<!DOCTYPE html><html><head><title>Lego Infrared Wireless Configuration</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>" +
                     "<h1>Wireless Lego Infrared Configuration</h1>" +
                     "<form method='POST' action='/'>" +
                     "<fieldset><legend>Wireless configuration</legend>" +
@@ -162,6 +164,17 @@ namespace SharedServices.Controllers
                     "</form></body></html>";
             WebServer.OutPutStream(e.Context.Response, route);
             WirelessAP.SetWifiAp();
+        }
+
+        [Route("reboot")]
+        public void Reboot(WebServerEventArgs e)
+        {
+            string route = $"<!DOCTYPE html><html><head><title>Reboot</title></head><body>" +
+                "<meta http-equiv=\"refresh\" content=\"0; url=/\" />" +
+                "</body></html>";
+            WebServer.OutPutStream(e.Context.Response, route);
+            Sleep.EnableWakeupByTimer(new System.TimeSpan(0, 0, 0, 1));
+            Sleep.StartDeepSleep();
         }
     }
 }

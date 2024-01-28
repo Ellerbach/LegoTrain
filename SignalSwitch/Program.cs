@@ -31,6 +31,7 @@ namespace LegoElement
         private static CancellationTokenSource _legoDiscoToken;
         private static bool _wifiApMode = false;
         private static Blinky _blinky;
+        private  static int _tries = 0;
 
         public static void Main()
         {
@@ -74,7 +75,7 @@ namespace LegoElement
             _server = new WebServer(80, HttpProtocol.Http, new Type[] { typeof(ApiController), typeof(ConfigurationController) });
             // Add a handler for commands that are received by the server.
             _server.CommandReceived += ServerCommandReceived;
-
+            _server.WebServerStatusChanged += WebServerStatusChanged;
 
             // Start the server.
             _server.Start();
@@ -82,6 +83,22 @@ namespace LegoElement
             AppConfiguration.OnConfigurationUpdated += OnConfigurationUpdated;
 
             Thread.Sleep(Timeout.Infinite);
+        }
+
+        private static void WebServerStatusChanged(object obj, WebServerStatusEventArgs e)
+        {
+            if (e.Status == WebServerStatus.Stopped)
+            {
+                if (_tries++ < 5)
+                {
+                    _server.Start();
+                }
+                else
+                {
+                    Sleep.EnableWakeupByTimer(new TimeSpan(0, 0, 0, 1));
+                    Sleep.StartDeepSleep();
+                }
+            }
         }
 
         private static void OnConfigurationUpdated(object sender, ConfigurationEventArgs e)
@@ -96,7 +113,8 @@ namespace LegoElement
             {
                 SetSwitch();
             }
-            else if (e.ParamName.StartsWith("Device") || e.ParamName.EndsWith("Activated"))
+            
+            if (e.ParamName.StartsWith("Device") || e.ParamName.EndsWith("Activated"))
             {
                 SetDiscovery();
             }
@@ -180,12 +198,12 @@ namespace LegoElement
         private static void ServerCommandReceived(object obj, WebServerEventArgs e)
         {
             // Not enough memory to handle those!
-            //if (e.Context.Request.RawUrl.StartsWith("/style.css"))
-            //{
-            //    e.Context.Response.ContentType = "text/css";
-            //    WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
-            //    return;
-            //}
+            if (e.Context.Request.RawUrl.StartsWith("/style.css"))
+            {
+                e.Context.Response.ContentType = "text/css";
+                WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
+                return;
+            }
             //else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
             //{
             //    var ico = ResourceWeb.GetBytes(ResourceWeb.BinaryResources.favicon);
@@ -201,7 +219,7 @@ namespace LegoElement
             }
             else
             {
-                string toOutput = "<html><head><title>Lego Signal/Switch</title></head><body>";
+                string toOutput = "<html><head><title>Lego Signal/Switch</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>";
                 if (AppConfiguration.SignalActivated)
                 {
                     toOutput += $"Your Signal configuration is <b>{(Signal == null ? "incorrect" : "valid")}</b>.<br/>";
@@ -223,7 +241,7 @@ namespace LegoElement
                 }
 
                 toOutput += "To configure your device please go to <a href=\"/config\">configuration</a>.<br/>";
-                toOutput += "Reset your wifi by cliking <a href=\"/resetwifi\">here</a>.";
+                toOutput += "Reset your wifi by cliking <a href=\"/resetwifi\">here</a>.<br>";
                 toOutput += "</body></html>";
                 WebServer.OutPutStream(e.Context.Response, toOutput);
                 return;

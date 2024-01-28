@@ -29,15 +29,6 @@ namespace LegoInfrared
         {
             return ((string)(nanoFramework.Runtime.Native.ResourceUtility.GetObject(ResourceManager, id)));
         }
-        internal static byte[] GetBytes(ResourceWeb.BinaryResources id)
-        {
-            return ((byte[])(nanoFramework.Runtime.Native.ResourceUtility.GetObject(ResourceManager, id)));
-        }
-        [System.SerializableAttribute()]
-        internal enum BinaryResources : short
-        {
-            favicon = -22914,
-        }
         [System.SerializableAttribute()]
         internal enum StringResources : short
         {
