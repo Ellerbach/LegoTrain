@@ -50,7 +50,6 @@ function buildSwitch(boxMSG, num) {
     if (obj != null)
         if (num == 0) obj.src = 'config/switch-' + obj.getAttribute("data-type") + '-str.png'; else obj.src = 'config/switch-' + obj.getAttribute("data-type") + '-trn.png';
 }
-var NumberSwitch = 16;
 function getswitches() {
     var xhr = new XMLHttpRequest(); xhr.open('GET', 'api/switchstatus?_=' + Math.random()); xhr.send(null); xhr.onreadystatechange = function () {
         if (xhr.readyState == 4)
@@ -74,7 +73,6 @@ function buildSignal(boxMSG, num) {
             obj.src = 'config/signal-red.png';
         else obj.src = 'config/signal-black.png';
 }
-var NumberSignal = 16;
 function getsignals() {
     var xhr = new XMLHttpRequest(); xhr.open('GET', 'api/signalstatus?_=' + Math.random()); xhr.send(null); xhr.onreadystatechange = function () {
         if (xhr.readyState == 4)

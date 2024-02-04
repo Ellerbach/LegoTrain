@@ -28,14 +28,14 @@
         }
     }
     <table>
-        <TR>
             @for (int i = 0; i < Model.Trains.Count; i++)
             {
-                int speed = 16 - (int)Model.Trains[i].NominalSpeed;
+                int speed = 15 - (int)Model.Trains[i].NominalSpeed;
                 int speedFwd = (int)Model.Trains[i].NominalSpeed;
                 int output = (int)Model.Trains[i].Output;
                 int channel = (int)Model.Trains[i].Channel;
                 string trainId = "train" + i;
+            <TR>
                 <form>
                 <td>
                         @Model.Trains[i].Name
@@ -59,8 +59,10 @@
                     <span id='@trainId'></span>
                 </td>
                 </form>
-            }
-        </TR>
+            </TR>
+            }        
     </table>
 </div>
-@Html.RenderPartialAsync("_DisplayMapAndSignals", Model)
+@{
+    await Html.RenderPartialAsync("_DisplayMapAndSignals", Model);
+}

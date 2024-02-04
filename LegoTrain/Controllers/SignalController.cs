@@ -67,9 +67,10 @@ namespace LegoTrain.Controllers
         }
 
         // GET: SignalController/Create
-        public ActionResult Create()
+        public ActionResult Create(int id)
         {
-            return View();
+            Signal sig = new Signal { Id = id };
+            return View(sig);
         }
 
         // POST: SignalController/Create

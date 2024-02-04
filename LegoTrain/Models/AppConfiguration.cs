@@ -49,6 +49,7 @@ namespace LegoTrain.Models
             }
         }
 
+        [JsonIgnore]
         public LegoDiscovery Discovery
         {
             get => _disco;

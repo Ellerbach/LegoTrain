@@ -24,7 +24,7 @@ namespace SharedServices.Controllers
             //nanoFramework.Runtime.Native.GC.Run(true);
 
             // TODO: check the basic authentication
-            string route = "<!DOCTYPE html><html><head><title>Configuration</title><link rel=\"stylesheet\" href=\"style.css\"></head><body><fieldset><legend>Configuration</legend><form action=\"/process\" method=\"post\">";
+            string route = "<!DOCTYPE html><html><head><title>Configuration</title><link rel=\"stylesheet\" href=\"style.css\"></head><body><form action=\"/process\" method=\"post\"><fieldset><legend>Configuration</legend>";
             e.Context.Response.ContentType = "text/html";
             // It's the moment to create a new configuration
 
@@ -47,12 +47,16 @@ namespace SharedServices.Controllers
                             type = $"checkbox\" {((bool)ret ? $"checked=\"" : string.Empty)}";
                             hiddenBool += $"{name}={ret};";
                             break;
-                        default:
-                            type = $"input\" value=\"{method.Invoke(AppConfiguration, null)}";
+                        default:                            
                             if (name.Contains("Password"))
                             {
                                 type = $"password\" value=\"{method.Invoke(AppConfiguration, null)}";
                             }
+                            else
+                            {
+                                type = $"input\" value=\"{method.Invoke(AppConfiguration, null)}";
+                            }
+
                             break;
                     }
 
@@ -66,7 +70,7 @@ namespace SharedServices.Controllers
 
             hiddenBool += hiddenBool.TrimEnd(';') + "\"/>";
             route += hiddenBool;
-            route += "<input type=\"submit\" value=\"Submit\"></form></fieldset><br>Device ID should start at 1.</body></html>";
+            route += "<input type=\"submit\" value=\"Save\"></fieldset></form><br>Device ID should start at 1.</body></html>";
             WebServer.OutPutStream(e.Context.Response, route);
         }
 

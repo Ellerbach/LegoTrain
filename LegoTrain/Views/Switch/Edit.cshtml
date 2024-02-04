@@ -18,8 +18,12 @@
         @Html.EditorFor(model => model.Y, new { @class = "form-control" })
     </div>
     <div class="form-group">
+        @Html.LabelFor(model => model.Rotation, new { @class = "control-label" })
+        @Html.EditorFor(model => model.Rotation, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
         @Html.LabelFor(model => model.IsLeft, new { @class = "control-label" })
-        @Html.CheckBoxFor(model => model.IsLeft, new { @class = "form-control" })
+        @Html.CheckBoxFor(model => model.IsLeft, new { @class = "form-check-label" })
     </div>
 
     <div class="form-group">
