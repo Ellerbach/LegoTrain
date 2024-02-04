@@ -28,5 +28,8 @@ namespace LegoTrain.Models
 
         [Display(Name = "Is module connected")]
         public bool IsConnected { get; set; }
+
+        [Display(Name = "Rotation in degrees")]
+        public int Rotation { get; set; }
     }
 }

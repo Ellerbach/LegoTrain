@@ -66,9 +66,10 @@ namespace LegoTrain.Controllers
         }
 
         // GET: SwitchController/Create
-        public ActionResult Create()
+        public ActionResult Create(int id)
         {
-            return View();
+            Switch swt = new Switch() { Id = id };
+            return View(swt);
         }
 
         // POST: SwitchController/Create
