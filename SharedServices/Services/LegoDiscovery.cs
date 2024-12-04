@@ -2,7 +2,6 @@
 // Laurent Ellerbach licenses this file to you under the MIT license.
 
 using System.Net;
-using System.Text;
 using System;
 using System.Threading;
 using System.Net.Sockets;
@@ -21,6 +20,11 @@ namespace SharedServices.Services
         private int _deviceId;
         private CancellationTokenSource _tokenSource;
         private Thread _runner;
+
+        /// <summary>
+        /// The IP Address of the server which sent a DISCO request.
+        /// </summary>
+        public IPAddress ServerAddress { get; internal set; }
 
         public LegoDiscovery(IPAddress ipaddess, int deviceId, DeviceCapability capabilities)
         {
@@ -69,6 +73,7 @@ namespace SharedServices.Services
                             Console.WriteLine($"MSG: {BitConverter.ToString(recvBuffer)}, decode: {res}, type: {messageType}");
                             if (res && messageType == DiscoveryMessageType.Discovery)
                             {
+                                ServerAddress = ((IPEndPoint)from).Address;
                                 SendCapabilities(((IPEndPoint)from).Address);
                             }
                         }

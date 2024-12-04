@@ -57,7 +57,7 @@ namespace SharedServices.Services
                 bool res = Wireless80211.Configure(ssid, password);
 
                 var route = $"<!DOCTYPE html><html><head><title>WiFi configured</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>" +
-                    "<h1>NanoFramework</h1>" +
+                    "<h1>Lego element wifi configuration</h1>" +
                     "<p>New settings saved.</p><p>Rebooting device to put into normal mode.</p>" +
                     "<p>Please allow up to 10 seconds to reconnect to the IP address.</p>";
                 if (res)

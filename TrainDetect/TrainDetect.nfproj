@@ -8,35 +8,25 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectTypeGuids>{11A8DD76-328B-46DF-9F39-F559912D0360};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>cfeaa9a9-342b-480b-aefb-19a889c81e47</ProjectGuid>
+    <ProjectGuid>063aa0d6-4e12-4757-af97-29d6f1b2bd85</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <FileAlignment>512</FileAlignment>
-    <RootNamespace>SignalSwitch</RootNamespace>
-    <AssemblyName>SignalSwitch</AssemblyName>
+    <RootNamespace>TrainDetect</RootNamespace>
+    <AssemblyName>TrainDetect</AssemblyName>
     <TargetFrameworkVersion>v1.0</TargetFrameworkVersion>
   </PropertyGroup>
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.props" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.props')" />
   <ItemGroup>
     <Compile Include="Controllers\ApiController.cs" />
     <Compile Include="Models\AppConfiguration.cs" />
-    <Compile Include="Models\Signal.cs" />
-    <Compile Include="Models\SignalState.cs" />
-    <Compile Include="Models\Switch.cs" />
+    <Compile Include="Models\Detector.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResourceWeb.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ResourceWeb.resx</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Iot.Device.DhcpServer">
       <HintPath>..\packages\nanoFramework.Iot.Device.DhcpServer.1.2.644\lib\Iot.Device.DhcpServer.dll</HintPath>
-    </Reference>
-    <Reference Include="Iot.Device.ServoMotor">
-      <HintPath>..\packages\nanoFramework.Iot.Device.ServoMotor.1.2.673\lib\Iot.Device.ServoMotor.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>..\packages\nanoFramework.CoreLibrary.1.15.5\lib\mscorlib.dll</HintPath>
@@ -46,9 +36,6 @@
     </Reference>
     <Reference Include="nanoFramework.Json">
       <HintPath>..\packages\nanoFramework.Json.2.2.152\lib\nanoFramework.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="nanoFramework.ResourceManager">
-      <HintPath>..\packages\nanoFramework.ResourceManager.1.2.19\lib\nanoFramework.ResourceManager.dll</HintPath>
     </Reference>
     <Reference Include="nanoFramework.Runtime.Events">
       <HintPath>..\packages\nanoFramework.Runtime.Events.1.11.18\lib\nanoFramework.Runtime.Events.dll</HintPath>
@@ -68,11 +55,11 @@
     <Reference Include="nanoFramework.WebServer">
       <HintPath>..\packages\nanoFramework.WebServer.FileSystem.1.2.63\lib\nanoFramework.WebServer.dll</HintPath>
     </Reference>
+    <Reference Include="System.Device.Adc">
+      <HintPath>..\packages\nanoFramework.System.Device.Adc.1.1.11\lib\System.Device.Adc.dll</HintPath>
+    </Reference>
     <Reference Include="System.Device.Gpio">
       <HintPath>..\packages\nanoFramework.System.Device.Gpio.1.1.41\lib\System.Device.Gpio.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Device.Pwm">
-      <HintPath>..\packages\nanoFramework.System.Device.Pwm.1.1.10\lib\System.Device.Pwm.dll</HintPath>
     </Reference>
     <Reference Include="System.Device.Wifi">
       <HintPath>..\packages\nanoFramework.System.Device.Wifi.1.5.91\lib\System.Device.Wifi.dll</HintPath>
@@ -87,7 +74,7 @@
       <HintPath>..\packages\nanoFramework.System.Net.1.11.1\lib\System.Net.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http">
-      <HintPath>..\packages\nanoFramework.System.Net.Http.Server.1.5.150\lib\System.Net.Http.dll</HintPath>
+      <HintPath>..\packages\nanoFramework.System.Net.Http.1.5.150\lib\System.Net.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Sockets.UdpClient">
       <HintPath>..\packages\nanoFramework.System.Net.Sockets.UdpClient.1.1.65\lib\System.Net.Sockets.UdpClient.dll</HintPath>
@@ -99,23 +86,13 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <Import Project="..\LegoDiscoveryCommon\LegoDiscoveryCommon.projitems" Label="Shared" />
   <Import Project="..\SharedServices\SharedServices.projitems" Label="Shared" />
   <Import Project="..\nanoDiscovery\nanoDiscovery.projitems" Label="Shared" />
-  <Import Project="..\LegoDiscoveryCommon\LegoDiscoveryCommon.projitems" Label="Shared" />
   <Import Project="$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets" Condition="Exists('$(NanoFrameworkProjectSystemPath)NFProjectSystem.CSharp.targets')" />
   <ProjectExtensions>
     <ProjectCapabilities>
       <ProjectConfigurationsDeclaredAsItems />
     </ProjectCapabilities>
   </ProjectExtensions>
-  <ItemGroup>
-    <EmbeddedResource Include="ResourceWeb.resx">
-      <Generator>nFResXFileCodeGenerator</Generator>
-      <LastGenOutput>ResourceWeb.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Resources\favicon.ico" />
-    <Content Include="Resources\style.css" />
-  </ItemGroup>
 </Project>

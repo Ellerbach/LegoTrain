@@ -149,15 +149,15 @@ namespace SharedServices.Controllers
             // We need to clean things to get some memory
             nanoFramework.Runtime.Native.GC.Run(true);
             AppConfiguration.Save();
-            string route = $"<!DOCTYPE html><html><head><title>Configuration Page</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>Configuration saved and updated. Return to the <a href=\"http://{Wireless80211.GetCurrentIPAddress()}\">home page</a>.</body></html>";
+            string route = $"<!DOCTYPE html><html><head><title>Lego Element Configuration Page</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>Configuration saved and updated. Return to the <a href=\"http://{Wireless80211.GetCurrentIPAddress()}\">home page</a>.</body></html>";
             WebServer.OutPutStream(e.Context.Response, route);
         }
 
         [Route("resetwifi")]
         public void ResetWifi(WebServerEventArgs e)
         {
-            string route = $"<!DOCTYPE html><html><head><title>Lego Infrared Wireless Configuration</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>" +
-                    "<h1>Wireless Lego Infrared Configuration</h1>" +
+            string route = $"<!DOCTYPE html><html><head><title>Lego Element Wireless Configuration</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>" +
+                    "<h1>Wireless Lego Element Configuration</h1>" +
                     "<form method='POST' action='/'>" +
                     "<fieldset><legend>Wireless configuration</legend>" +
                     "Ssid:</br><input type='input' name='ssid' value='' ></br>" +

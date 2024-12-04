@@ -31,7 +31,8 @@ namespace LegoElement
         private static CancellationTokenSource _legoDiscoToken;
         private static bool _wifiApMode = false;
         private static Blinky _blinky;
-        private  static int _tries = 0;
+        private static int _tries = 0;
+        private static Timer _timerWiatingWifiSetup;
 
         public static void Main()
         {
@@ -69,6 +70,12 @@ namespace LegoElement
             else
             {
                 _blinky.BlinkWaiWifi();
+                if (Wireless80211.IsEnabled())
+                {
+                    // This will reboot the device every 5 minutes as we seem to have a valid configuration
+                    // It will then try to reconnect
+                    _timerWiatingWifiSetup = new Timer(TimerCallBackReboot, null, 5 * 60 * 1000, 0);
+                }
             }
 
             Debug.WriteLine($"Connected with wifi credentials. IP Address: {(_wifiApMode ? WirelessAP.GetIP() : Wireless80211.GetCurrentIPAddress())}");
@@ -83,6 +90,13 @@ namespace LegoElement
             AppConfiguration.OnConfigurationUpdated += OnConfigurationUpdated;
 
             Thread.Sleep(Timeout.Infinite);
+        }
+
+        private static void TimerCallBackReboot(object state)
+        {
+            // We will basically try to reconnect after 1h
+            Sleep.EnableWakeupByTimer(new TimeSpan(0, 0, 0, 1));
+            Sleep.StartDeepSleep();
         }
 
         private static void WebServerStatusChanged(object obj, WebServerStatusEventArgs e)
@@ -113,7 +127,7 @@ namespace LegoElement
             {
                 SetSwitch();
             }
-            
+
             if (e.ParamName.StartsWith("Device") || e.ParamName.EndsWith("Activated"))
             {
                 SetDiscovery();
@@ -236,7 +250,7 @@ namespace LegoElement
                 }
                 else
                 {
-                    toOutput += $"Your device is properly set as {(AppConfiguration.SignalActivated && AppConfiguration.SwitchActivated ? "both Signal and Switch.": (AppConfiguration.SignalActivated ? "signal." : "swith"))}<br/>";
+                    toOutput += $"Your device is properly set as {(AppConfiguration.SignalActivated && AppConfiguration.SwitchActivated ? "both Signal and Switch." : (AppConfiguration.SignalActivated ? "signal." : "swith"))}<br/>";
                     toOutput += $"Your device ID is {(AppConfiguration.DeviceId < 0 ? "invalid, it must be more or equal to 1." : AppConfiguration.DeviceId)}.<br>";
                 }
 

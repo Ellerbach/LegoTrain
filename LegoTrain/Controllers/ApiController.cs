@@ -22,6 +22,7 @@ namespace LegoTrain.Controllers
         public const string PageSinglePwmAll = "singlepwmall";
         public const string PageComboPwm = "combopwm";
         public const string PageComboPwmAll = "combopwmall";
+        public const string PageDetect = "detect";
 
         private readonly ILogger<ApiController> _logger;
         private readonly AppConfiguration _config;
@@ -30,6 +31,12 @@ namespace LegoTrain.Controllers
         {
             _logger = logger;
             _config = configuration;
+        }
+
+        [HttpGet(PageDetect)]
+        public IActionResult Detect(int id, int de, int va)
+        {
+            return Ok();
         }
 
         [HttpGet(PageCombo)]

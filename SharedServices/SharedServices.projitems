@@ -19,7 +19,13 @@
     <Compile Include="$(MSBuildThisFileDirectory)Services\WirelessAp.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)Resources\favicon.ico" />
-    <Content Include="$(MSBuildThisFileDirectory)Resources\style.css" />
+    <Content Include="$(MSBuildThisFileDirectory)Resources\favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <NF_StoragePath>I:\favicon.ico</NF_StoragePath>
+    </Content>
+    <Content Include="$(MSBuildThisFileDirectory)Resources\style.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <NF_StoragePath>I:\style.css</NF_StoragePath>
+    </Content>
   </ItemGroup>
 </Project>
