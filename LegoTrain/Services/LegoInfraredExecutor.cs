@@ -5,17 +5,34 @@ using System;
 
 namespace LegoTrain.Services
 {
+    /// <summary>
+    /// Executes Lego infrared commands by sending HTTP requests to an infrared transmitter device.
+    /// </summary>
     public class LegoInfraredExecutor
     {
+        /// <summary>
+        /// The device ID used for infrared transmitter devices.
+        /// </summary>
         public const int DeviceIDType = 0;
         private static readonly HttpClient _client = new HttpClient();
         private LegoDiscovery _disco;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LegoInfraredExecutor"/> class.
+        /// </summary>
+        /// <param name="legoDiscovery">The device discovery service.</param>
         public LegoInfraredExecutor(LegoDiscovery legoDiscovery)
         {
             _disco = legoDiscovery;
         }
 
+        /// <summary>
+        /// Sends a combo command to control two motors on the specified channel.
+        /// </summary>
+        /// <param name="ch">The channel.</param>
+        /// <param name="bl">The blue motor speed.</param>
+        /// <param name="rd">The red motor speed.</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool Combo(Channel ch, Speed bl, Speed rd)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();
@@ -30,6 +47,13 @@ namespace LegoTrain.Services
             return res.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Sends a single PWM command to control a motor.
+        /// </summary>
+        /// <param name="ch">The channel.</param>
+        /// <param name="pw">The PWM speed.</param>
+        /// <param name="op">The output (Red or Blue).</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool SinglePwm(Channel ch, PwmSpeed pw, PwmOutput op)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();
@@ -44,6 +68,12 @@ namespace LegoTrain.Services
             return res.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Sends a continuous function command.
+        /// </summary>
+        /// <param name="fc">The function.</param>
+        /// <param name="op">The output.</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool Continuous(Function fc, Output op)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();
@@ -58,6 +88,13 @@ namespace LegoTrain.Services
             return res.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Sends a single clear/set/toggle command.
+        /// </summary>
+        /// <param name="ch">The channel.</param>
+        /// <param name="pw">The clear/set/toggle value.</param>
+        /// <param name="op">The output.</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool SingleCst(Channel ch, ClearSetToggle pw, PwmOutput op)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();
@@ -72,6 +109,13 @@ namespace LegoTrain.Services
             return res.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Sends a timeout function command.
+        /// </summary>
+        /// <param name="ch">The channel.</param>
+        /// <param name="fc">The function.</param>
+        /// <param name="op">The output.</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool Timeout(Channel ch, Function fc, Output op)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();
@@ -86,6 +130,12 @@ namespace LegoTrain.Services
             return res.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Sends combo commands to all four channels simultaneously.
+        /// </summary>
+        /// <param name="comboBlue">Array of blue motor speeds for channels 0-3.</param>
+        /// <param name="comboRed">Array of red motor speeds for channels 0-3.</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool ComboAll(Speed[] comboBlue, Speed[] comboRed)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();
@@ -100,6 +150,12 @@ namespace LegoTrain.Services
             return res.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Sends continuous function commands to all four channels simultaneously.
+        /// </summary>
+        /// <param name="function">Array of functions for channels 0-3.</param>
+        /// <param name="output">Array of outputs for channels 0-3.</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool ContinuousAll(Function[] function, Output[] output)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();
@@ -114,6 +170,12 @@ namespace LegoTrain.Services
             return res.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Sends single PWM commands to all four channels simultaneously.
+        /// </summary>
+        /// <param name="pwm">Array of PWM speeds for channels 0-3.</param>
+        /// <param name="output">Array of outputs for channels 0-3.</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool SinglePwmAll(PwmSpeed[] pwm, PwmOutput[] output)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();
@@ -128,6 +190,12 @@ namespace LegoTrain.Services
             return res.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Sends combo PWM commands to all four channels simultaneously.
+        /// </summary>
+        /// <param name="pwmRed">Array of red PWM speeds for channels 0-3.</param>
+        /// <param name="pwmBlue">Array of blue PWM speeds for channels 0-3.</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool ComboPwmAll(PwmSpeed[] pwmRed, PwmSpeed[] pwmBlue)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();
@@ -142,6 +210,13 @@ namespace LegoTrain.Services
             return res.IsSuccessStatusCode;
         }
 
+        /// <summary>
+        /// Sends a combo PWM command to control two motors with PWM speeds.
+        /// </summary>
+        /// <param name="ch">The channel.</param>
+        /// <param name="bl">PWM speed for blue motor.</param>
+        /// <param name="rd">PWM speed for red motor.</param>
+        /// <returns>True if the command was sent successfully, false otherwise.</returns>
         public bool ComboPwm(Channel ch, PwmSpeed bl, PwmSpeed rd)
         {
             var dev = _disco.DeviceDetails.Where(m => m.Id == DeviceIDType).FirstOrDefault();

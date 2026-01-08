@@ -19,6 +19,9 @@ namespace SharedServices.Services
         public const string SoftApIP = "192.168.4.1";
         public static string SoftApSsid { get; set; } = "LegoInfrared";
 
+        /// <summary>
+        /// Configures and starts the WiFi Access Point with DHCP server.
+        /// </summary>
         public static void SetWifiAp()
         {
             Wireless80211.Disable();
@@ -115,6 +118,10 @@ namespace SharedServices.Services
             return WirelessAPConfiguration.GetAllWirelessAPConfigurations()[ni.SpecificConfigId];
         }
 
+        /// <summary>
+        /// Gets the wireless AP network interface.
+        /// </summary>
+        /// <returns>The NetworkInterface for wireless AP, or null if not found.</returns>
         public static NetworkInterface GetInterface()
         {
             NetworkInterface[] Interfaces = NetworkInterface.GetAllNetworkInterfaces();

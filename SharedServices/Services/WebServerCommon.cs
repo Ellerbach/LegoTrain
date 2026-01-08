@@ -5,14 +5,25 @@ using nanoFramework.Hardware.Esp32;
 using nanoFramework.Runtime.Native;
 using nanoFramework.WebServer;
 using System;
+using System.Collections;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Web;
 
 namespace SharedServices.Services
 {
+    /// <summary>
+    /// Provides common web server functionality for nanoFramework devices.
+    /// </summary>
     public static class WebServerCommon
     {
+        private static ArrayList _files = new ArrayList();
+
+        /// <summary>
+        /// Handles WiFi configuration requests via web interface.
+        /// </summary>
+        /// <param name="e">The web server event arguments.</param>
         public static void SetupWifi(WebServerEventArgs e)
         {
             if (e.Context.Request.HttpMethod == "GET")
@@ -27,7 +38,7 @@ namespace SharedServices.Services
                     "<input type='submit' value='Save'>" +
                     "</fieldset>" +
                     "</form></body></html>";
-                WebServer.OutPutStream(e.Context.Response, route);
+                WebServer.OutputAsStream(e.Context.Response, route);
             }
             else
             {
@@ -68,7 +79,7 @@ namespace SharedServices.Services
                 route += $"<p>If not configured properly, connect again to the SSID {WirelessAP.SoftApSsid} and then to <a href='http://{WirelessAP.SoftApIP}'>http://{WirelessAP.SoftApIP}</a></p>" +
                 "</body></html>";
 
-                WebServer.OutPutStream(e.Context.Response, route);
+                WebServer.OutputAsStream(e.Context.Response, route);
 
                 // Needed to make sure all is getting out
                 Thread.Sleep(200);
@@ -79,6 +90,85 @@ namespace SharedServices.Services
                 Sleep.EnableWakeupByTimer(new TimeSpan(0, 0, 0, 1));
                 Sleep.StartDeepSleep();
             }
+        }
+
+        /// <summary>
+        /// Populates the list of available files from the I:\ drive.
+        /// </summary>
+        public static void PopulateFiles()
+        {
+            _files.Clear();
+            // list all files in directories and subdirectories of I:\ drive
+            ListFiles("I:\\");
+        }
+
+        private static void ListFiles(string directory)
+        {
+            try
+            {
+                // Get all files in the current directory
+                string[] files = Directory.GetFiles(directory);
+                foreach (string file in files)
+                {
+                    _files.Add(file);
+                }
+
+                // Get all subdirectories in the current directory
+                string[] subdirectories = Directory.GetDirectories(directory);
+                foreach (string subdirectory in subdirectories)
+                {
+                    // Recursively list files in each subdirectory
+                    ListFiles(subdirectory);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error listing files in directory {directory}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Serves static files from the I:\ drive.
+        /// </summary>
+        /// <param name="e">The web server event arguments.</param>
+        public static void ServeStaticFiles(WebServerEventArgs e)
+        {
+            string path = e.Context.Request.RawUrl;
+
+            try
+            {
+                var file = $"I:\\{ReplaceSlashWithBackslash(path.Substring(1))}";
+                // Checks if the file exists in the list
+                if (!_files.Contains(file))
+                {
+                    WebServer.OutputAsStream(e.Context.Response, "File not found");
+                    return;
+                }
+
+                WebServer.SendFileOverHTTP(e.Context.Response, file);
+            }
+            catch (Exception)
+            {
+                WebServer.OutputAsStream(e.Context.Response, "File not found");
+            }
+        }
+
+        /// <summary>
+        /// Replaces forward slashes with backslashes in a path string.
+        /// </summary>
+        /// <param name="input">The input path string.</param>
+        /// <returns>The path string with backslashes.</returns>
+        public static string ReplaceSlashWithBackslash(string input)
+        {
+            char[] chars = input.ToCharArray();
+            for (int i = 0; i < chars.Length; i++)
+            {
+                if (chars[i] == '/')
+                {
+                    chars[i] = '\\';
+                }
+            }
+            return new string(chars);
         }
     }
 }

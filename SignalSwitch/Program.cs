@@ -12,7 +12,6 @@ using System.Net;
 using System.Threading;
 using SharedServices.Controllers;
 using SharedServices.Services;
-using SignalSwitch;
 using nanoDiscovery.Common;
 
 namespace LegoElement
@@ -211,21 +210,16 @@ namespace LegoElement
 
         private static void ServerCommandReceived(object obj, WebServerEventArgs e)
         {
-            // Not enough memory to handle those!
             if (e.Context.Request.RawUrl.StartsWith("/style.css"))
             {
-                e.Context.Response.ContentType = "text/css";
-                WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
+                WebServer.SendFileOverHTTP(e.Context.Response, "I:\\Resources\\style.css", "text/css");
                 return;
             }
-            //else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
-            //{
-            //    var ico = ResourceWeb.GetBytes(ResourceWeb.BinaryResources.favicon);
-            //    e.Context.Response.ContentType = "image/ico";
-            //    e.Context.Response.ContentLength64 = ico.Length;
-            //    e.Context.Response.OutputStream.Write(ico, 0, ico.Length);
-            //    return;
-            //}
+            else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
+            {
+                WebServer.SendFileOverHTTP(e.Context.Response, "I:\\Resources\\favicon.ico", "image/ico");
+                return;
+            }
 
             if (_wifiApMode)
             {
@@ -257,7 +251,7 @@ namespace LegoElement
                 toOutput += "To configure your device please go to <a href=\"/config\">configuration</a>.<br/>";
                 toOutput += "Reset your wifi by cliking <a href=\"/resetwifi\">here</a>.<br>";
                 toOutput += "</body></html>";
-                WebServer.OutPutStream(e.Context.Response, toOutput);
+                WebServer.OutputAsStream(e.Context.Response, toOutput);
                 return;
             }
         }

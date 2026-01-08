@@ -10,15 +10,26 @@ using nanoDiscovery.Common;
 
 namespace LegoTrain.Controllers
 {
+    /// <summary>
+    /// Controller for managing signal devices on the Lego train circuit.
+    /// </summary>
     public class SignalController : Controller
     {
         private readonly AppConfiguration _configuration;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SignalController"/> class.
+        /// </summary>
+        /// <param name="configuration">The application configuration.</param>
         public SignalController(AppConfiguration configuration)
         {
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Displays a list of all configured signals with their connection status.
+        /// </summary>
+        /// <returns>The index view with the list of signals.</returns>
         // GET: SignalController
         public ActionResult Index()
         {
@@ -41,6 +52,11 @@ namespace LegoTrain.Controllers
             return View(_configuration.Signals);
         }
 
+        /// <summary>
+        /// Displays detailed information about a specific signal.
+        /// </summary>
+        /// <param name="id">The signal identifier.</param>
+        /// <returns>The details view for the signal, or NotFound if the signal doesn't exist.</returns>
         // GET: SignalController/Details/5
         public ActionResult Details(int id)
         {
@@ -66,6 +82,11 @@ namespace LegoTrain.Controllers
             return View(sig);
         }
 
+        /// <summary>
+        /// Displays the form for creating a new signal.
+        /// </summary>
+        /// <param name="id">The signal identifier.</param>
+        /// <returns>The create view with a new signal.</returns>
         // GET: SignalController/Create
         public ActionResult Create(int id)
         {
@@ -73,6 +94,11 @@ namespace LegoTrain.Controllers
             return View(sig);
         }
 
+        /// <summary>
+        /// Processes the creation of a new signal.
+        /// </summary>
+        /// <param name="collection">The signal data to create.</param>
+        /// <returns>Redirects to Index on success, or returns the view with validation errors.</returns>
         // POST: SignalController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -101,6 +127,11 @@ namespace LegoTrain.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Displays the form for editing an existing signal.
+        /// </summary>
+        /// <param name="id">The signal identifier.</param>
+        /// <returns>The edit view for the signal, or NotFound if the signal doesn't exist.</returns>
         // GET: SignalController/Edit/5
         public ActionResult Edit(int id)
         {
@@ -113,6 +144,12 @@ namespace LegoTrain.Controllers
             return View(sig);
         }
 
+        /// <summary>
+        /// Processes the editing of an existing signal.
+        /// </summary>
+        /// <param name="id">The signal identifier.</param>
+        /// <param name="collection">The updated signal data.</param>
+        /// <returns>Redirects to Index on success, or returns the view with validation errors.</returns>
         // POST: SignalController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -138,6 +175,11 @@ namespace LegoTrain.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Displays the confirmation page for deleting a signal.
+        /// </summary>
+        /// <param name="id">The signal identifier.</param>
+        /// <returns>The delete view for the signal, or NotFound if the signal doesn't exist.</returns>
         // GET: SignalController/Delete/5
         public ActionResult Delete(int id)
         {
@@ -150,6 +192,11 @@ namespace LegoTrain.Controllers
             return View(sig);
         }
 
+        /// <summary>
+        /// Processes the deletion of a signal.
+        /// </summary>
+        /// <param name="id">The signal identifier.</param>
+        /// <returns>Redirects to Index on success, or returns the view on error.</returns>
         // POST: SignalController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]

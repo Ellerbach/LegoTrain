@@ -1,27 +1,68 @@
 ﻿@model LegoTrain.Models.AppConfiguration
 
-<div>
+<div id="mapContainer" style="position: relative; display: inline-block;">
+    <img alt="Map of the city" id="MyImage" src="/config/circuit.png" style="max-width: 100%;" />
     @for (int i = 0; i < Model.Switches.Count; i++)
     {
-        string top = Model.Switches[i].Y + "px";
-        string left = Model.Switches[i].X + "px";
         string switchId = "switch" + Model.Switches[i].Id;
         string para = "si=" + Model.Switches[i].Id;
         string datatype = Model.Switches[i].IsLeft ? "left" : "right";
         string rotation = "rotate(" + Model.Switches[i].Rotation + "deg)";
-        <span style='position: absolute;margin-left:@left; margin-top:@top; top:findTop(document.all.MyImage); left:findLeft(document.all.MyImage);'>
-            <img border='0' src="" data-type="@datatype" style="transform: @rotation" id='@switchId' onClick="swclicked(document.getElementById('@switchId'), '@para');" />
-        </span>
+        <img border='0' src="" data-type="@datatype" data-natural-x="@Model.Switches[i].X" data-natural-y="@Model.Switches[i].Y" style="position: absolute; transform: @rotation; transform-origin: center;" class="map-switch" id='@switchId' onClick="swclicked(document.getElementById('@switchId'), '@para');" />
     }
     @for (int i = 0; i < Model.Signals.Count; i++)
     {
-        string top = Model.Signals[i].Y + "px";
-        string left = Model.Signals[i].X + "px";
         string signalId = "signal" + Model.Signals[i].Id;
         string para = "si=" + Model.Signals[i].Id;
-        <span style='position: absolute;margin-left:@left; margin-top:@top; top:findTop(document.all.MyImage); left:findLeft(document.all.MyImage);'>
-            <img border='0' src="" id='@signalId' onClick="siclicked(document.getElementById('@signalId'), '@para');" />
-        </span>
+        <img border='0' src="" data-natural-x="@Model.Signals[i].X" data-natural-y="@Model.Signals[i].Y" style="position: absolute;" class="map-signal" id='@signalId' onClick="siclicked(document.getElementById('@signalId'), '@para');" />
     }
-    <img alt="Map of the city" id="MyImage" src="config/circuit.png" />
 </div>
+
+<script>
+function scaleMapElements() {
+    const circuitMap = document.getElementById('MyImage');
+    if (!circuitMap) {
+        console.error('Circuit map element not found');
+        return;
+    }
+
+    if (circuitMap.naturalWidth === 0 || circuitMap.naturalHeight === 0) {
+        console.log('Image not yet loaded, retrying...');
+        setTimeout(scaleMapElements, 50);
+        return;
+    }
+
+    const scale = circuitMap.clientWidth / circuitMap.naturalWidth;
+    console.log('Scaling elements - naturalWidth:', circuitMap.naturalWidth, 'clientWidth:', circuitMap.clientWidth, 'scale:', scale);
+
+    document.querySelectorAll('.map-switch, .map-signal').forEach(element => {
+        const naturalX = parseInt(element.getAttribute('data-natural-x')) || 0;
+        const naturalY = parseInt(element.getAttribute('data-natural-y')) || 0;
+        
+        const displayX = naturalX * scale;
+        const displayY = naturalY * scale;
+        
+        console.log('Element', element.id, '- Natural:', naturalX, naturalY, '-> Display:', displayX, displayY);
+        
+        element.style.left = displayX + 'px';
+        element.style.top = displayY + 'px';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const circuitMap = document.getElementById('MyImage');
+    if (circuitMap) {
+        circuitMap.addEventListener('load', function() {
+            console.log('Image loaded');
+            scaleMapElements();
+        });
+        
+        if (circuitMap.complete && circuitMap.naturalWidth > 0) {
+            console.log('Image already loaded');
+            scaleMapElements();
+        }
+    }
+});
+
+window.addEventListener('resize', scaleMapElements);
+</script>

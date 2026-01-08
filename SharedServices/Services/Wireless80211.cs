@@ -10,8 +10,15 @@ using System.Threading;
 
 namespace SharedServices.Services
 {
+    /// <summary>
+    /// Provides wireless 802.11 (WiFi) configuration and management for nanoFramework devices.
+    /// </summary>
     class Wireless80211
     {
+        /// <summary>
+        /// Checks if wireless configuration is enabled.
+        /// </summary>
+        /// <returns>True if wireless is configured with an SSID, false otherwise.</returns>
         public static bool IsEnabled()
         {
             Wireless80211Configuration wconf = GetConfiguration();
@@ -19,9 +26,9 @@ namespace SharedServices.Services
         }
 
         /// <summary>
-        /// Get current IP address. Only valid if successfully provisioned and connected
+        /// Gets the current IP address. Only valid if successfully provisioned and connected.
         /// </summary>
-        /// <returns>IP address string</returns>
+        /// <returns>IP address string.</returns>
         public static string GetCurrentIPAddress()
         {
             NetworkInterface ni = NetworkInterface.GetAllNetworkInterfaces()[0];
@@ -31,9 +38,9 @@ namespace SharedServices.Services
         }
 
         /// <summary>
-        /// Coonnects to the Wifi or sets the Access Point mode.
+        /// Connects to the WiFi network or sets up the Access Point mode if connection fails.
         /// </summary>
-        /// <returns>True if access point is setup.</returns>
+        /// <returns>True if access point is setup, false if connected to WiFi.</returns>
         public static bool ConnectOrSetAp()
         {
             if (IsEnabled())
@@ -55,7 +62,7 @@ namespace SharedServices.Services
         }
 
         /// <summary>
-        /// Disable the Wireless station interface.
+        /// Disables the wireless station interface.
         /// </summary>
         public static void Disable()
         {
@@ -65,11 +72,11 @@ namespace SharedServices.Services
         }
 
         /// <summary>
-        /// Configure and enable the Wireless station interface
+        /// Configures and enables the wireless station interface.
         /// </summary>
-        /// <param name="ssid"></param>
-        /// <param name="password"></param>
-        /// <returns></returns>
+        /// <param name="ssid">The SSID of the network to connect to.</param>
+        /// <param name="password">The password for the network.</param>
+        /// <returns>True if connection is successful, false otherwise.</returns>
         public static bool Configure(string ssid, string password)
         {
             // Make sure we are disconnected before we start connecting otherwise
@@ -107,15 +114,19 @@ namespace SharedServices.Services
         }
 
         /// <summary>
-        /// Get the Wireless station configuration.
+        /// Gets the wireless station configuration.
         /// </summary>
-        /// <returns>Wireless80211Configuration object</returns>
+        /// <returns>The Wireless80211Configuration object.</returns>
         public static Wireless80211Configuration GetConfiguration()
         {
             NetworkInterface ni = GetInterface();
             return Wireless80211Configuration.GetAllWireless80211Configurations()[ni.SpecificConfigId];
         }
 
+        /// <summary>
+        /// Gets the wireless network interface.
+        /// </summary>
+        /// <returns>The NetworkInterface for wireless, or null if not found.</returns>
         public static NetworkInterface GetInterface()
         {
             NetworkInterface[] Interfaces = NetworkInterface.GetAllNetworkInterfaces();

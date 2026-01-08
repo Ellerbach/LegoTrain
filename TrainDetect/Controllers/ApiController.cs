@@ -27,7 +27,7 @@ namespace LegoElement.Controllers
                 resp = Application.Detectors[1].Value.ToString();
             }
 
-            WebServer.OutPutStream(e.Context.Response, resp);
+            WebServer.OutputAsStream(e.Context.Response, resp);
         }
 
         [Route("detectstart")]
@@ -43,7 +43,7 @@ namespace LegoElement.Controllers
                 Application.Detectors[1].Detect = true;
             }
 
-            WebServer.OutPutStream(e.Context.Response, "Detection started");
+            WebServer.OutputAsStream(e.Context.Response, "Detection started");
         }
 
         private static bool TryConvertInt32(string val, out int result, int min, int max)

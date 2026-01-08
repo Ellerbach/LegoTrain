@@ -9,15 +9,26 @@ using LegoTrain.Models.Device;
 
 namespace LegoTrain.Controllers
 {
+    /// <summary>
+    /// Controller for managing the overall configuration of the Lego train system.
+    /// </summary>
     [Route("[controller]")]
     public class ConfigurationController : Controller
     {
         private readonly AppConfiguration _configuration;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConfigurationController"/> class.
+        /// </summary>
+        /// <param name="configuration">The application configuration.</param>
         public ConfigurationController(AppConfiguration configuration)
         {
             _configuration = configuration;
         }
+        /// <summary>
+        /// Displays the main configuration page showing all signals, switches, and infrared devices.
+        /// </summary>
+        /// <returns>The configuration index view.</returns>
         // GET: ConfigurationController
         [HttpGet()]
         public ActionResult Index()

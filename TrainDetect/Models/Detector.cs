@@ -10,15 +10,34 @@ using System.Threading;
 
 namespace LegoElement.Models
 {
+    /// <summary>
+    /// Represents a train detector that monitors an ADC channel for train presence.
+    /// </summary>
     public class Detector : IDisposable
     {
         private AdcController _controller = new AdcController();
         private AdcChannel _channel;
         private Thread _thread;
 
-        public delegate void DetectorDetected(object sender, int e);
+        /// <summary>
+        /// Delegate for detector events.
+        /// </summary>
+        /// <param name="sender">The sender of the event.</param>
+        /// <param name="e">The ADC value.</param>
+        /// <param name="detected">True if train is detected, false otherwise.</param>
+        public delegate void DetectorDetected(object sender, int e, bool detected);
+        /// <summary>
+        /// Event raised when the detection state changes.
+        /// </summary>
         public event DetectorDetected OnDetection;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Detector"/> class.
+        /// </summary>
+        /// <param name="pinAdc">The ADC pin number.</param>
+        /// <param name="id">The detector identifier (0 or 1).</param>
+        /// <param name="threshold">The detection threshold value. Default is -1.</param>
+        /// <exception cref="Exception">Thrown when pin or id parameters are invalid.</exception>
         public Detector(int pinAdc, int id, int threshold = -1)
         {
             if ((pinAdc < 0) || (id < 0) || (id > 1))
@@ -42,22 +61,26 @@ namespace LegoElement.Models
             }
 
             Detect = false;
+            IsDetected = false;
 
             _thread = new Thread(() =>
             {
-                bool detected = false;
                 while (_thread.IsAlive)
                 {
                     Value = _channel.ReadValue();
-                    if (Detect && ((Value <= Threshold) && (!detected)))
+                    if (Detect)
                     {
-                        detected = true;
-                        OnDetection?.Invoke(this, Value);
-                    }
+                        if ((Value <= Threshold) && !IsDetected)
+                        {
+                            IsDetected = true;
+                            OnDetection?.Invoke(this, Value, IsDetected);
+                        }
 
-                    if (Value > Threshold)
-                    {
-                        detected = false;
+                        if ((Value > Threshold) && IsDetected)
+                        {
+                            IsDetected = false;
+                            OnDetection?.Invoke(this, Value, IsDetected);
+                        }
                     }
 
                     Thread.Sleep(20);
@@ -66,25 +89,51 @@ namespace LegoElement.Models
             _thread.Start();
         }
 
+        /// <summary>
+        /// Gets a value indicating whether a train is currently detected.
+        /// </summary>
+        public bool IsDetected { get; internal set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether detection is currently enabled.
+        /// </summary>
         public bool Detect { get; set; }
 
+        /// <summary>
+        /// Starts the detector thread.
+        /// </summary>
         public void Start()
         {
             _thread.Start();
         }
 
+        /// <summary>
+        /// Stops the detector thread.
+        /// </summary>
         public void Stop()
         {
             _thread.Abort();
             _thread.Join(100);
         }
 
+        /// <summary>
+        /// Gets the detector identifier.
+        /// </summary>
         public int Id { get; internal set; }
 
+        /// <summary>
+        /// Gets or sets the detection threshold value.
+        /// </summary>
         public int Threshold { get; set; }
 
+        /// <summary>
+        /// Gets the current ADC reading value.
+        /// </summary>
         public int Value { get; internal set; }
 
+        /// <summary>
+        /// Releases all resources used by the detector.
+        /// </summary>
         public void Dispose()
         {
             _thread.Abort();

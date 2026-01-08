@@ -8,6 +8,9 @@ using System.Diagnostics;
 
 namespace LegoTrain.Services
 {
+    /// <summary>
+    /// Manages track switch devices by sending HTTP commands to control their state.
+    /// </summary>
     public class SwitchManagement : ISwitchManagement
     {
         private static readonly HttpClient _client = new HttpClient();
@@ -19,11 +22,20 @@ namespace LegoTrain.Services
         // Pulse Cycle: 20 ms 
         // Pulse Width: 800-2190 µs 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SwitchManagement"/> class.
+        /// </summary>
+        /// <param name="discovery">The device discovery service.</param>
         public SwitchManagement(LegoDiscovery discovery)
         {
             _disco = discovery;
         }
 
+        /// <summary>
+        /// Changes the state of a switch by sending an HTTP request to the switch device.
+        /// </summary>
+        /// <param name="numSwitch">The switch number.</param>
+        /// <param name="value">The new switch state (true for one position, false for the other).</param>
         public void ChangeSwitch(byte numSwitch, bool value)
         {
             try
@@ -37,6 +49,11 @@ namespace LegoTrain.Services
             }
         }
 
+        /// <summary>
+        /// Gets the current state of a switch by querying the switch device.
+        /// </summary>
+        /// <param name="numSwitch">The switch number.</param>
+        /// <returns>The current switch state.</returns>
         public bool GetSwitch(byte numSwitch)
         {
             int state = 0;
@@ -58,6 +75,9 @@ namespace LegoTrain.Services
             return state == 1;
         }
 
+        /// <summary>
+        /// Releases all resources used by the switch management service.
+        /// </summary>
         public void Dispose()
         {
             // Nothing

@@ -15,6 +15,10 @@ using LegoElement.Models;
 using LegoElement.Controllers;
 using System.Net.Http;
 using nanoFramework.Hardware.Esp32.Touch;
+using System.Net.WebSockets.Server;
+using System.Net.WebSockets;
+using System.Net.WebSockets.WebSocketFrame;
+using System.Text;
 
 namespace LegoElement
 {
@@ -33,6 +37,7 @@ namespace LegoElement
         private static int _tries = 0;
         private static Timer _timerWiatingWifiSetup;
         private static HttpClient _httpClient;
+        private static WebSocketServer _wsServer;
 
         public static void Main()
         {
@@ -95,6 +100,19 @@ namespace LegoElement
             }
 
             Debug.WriteLine($"Connected with wifi credentials. IP Address: {(_wifiApMode ? WirelessAP.GetIP() : Wireless80211.GetCurrentIPAddress())}");
+
+            //Initialize WebsocketServer with Webserver intergration
+            _wsServer = new WebSocketServer(new WebSocketServerOptions()
+            {
+                MaxClients = 10,
+                IsStandAlone = false
+            });
+
+            _wsServer.MessageReceived += WsServerMessageReceived;
+            _wsServer.Start();
+
+            WebServerCommon.PopulateFiles();
+
             _server = new WebServer(80, HttpProtocol.Http, new Type[] { typeof(ApiController), typeof(ConfigurationController) });
             // Add a handler for commands that are received by the server.
             _server.CommandReceived += ServerCommandReceived;
@@ -106,6 +124,52 @@ namespace LegoElement
             AppConfiguration.OnConfigurationUpdated += OnConfigurationUpdated;
 
             Thread.Sleep(Timeout.Infinite);
+        }
+
+        private static void WsServerMessageReceived(object sender, MessageReceivedEventArgs e)
+        {
+            var wsServer = (WebSocketServer)sender;
+            if (e.Frame.MessageType == WebSocketMessageType.Text)
+            {
+                var message = Encoding.UTF8.GetString(e.Frame.Buffer, 0, e.Frame.Buffer.Length);
+                if (message == "status")
+                {
+                    wsServer.BroadCast(Encoding.UTF8.GetBytes(GetDetectorStatus()));
+                }
+                else if (message == "start")
+                {
+                    if (Application.Detectors[0] != null)
+                    {
+                        Application.Detectors[0].Detect = true;
+                    }
+
+                    if (Application.Detectors[1] != null)
+                    {
+                        Application.Detectors[1].Detect = true;
+                    }
+
+                    wsServer.BroadCast(e.Frame.Buffer);
+                }
+            }
+        }
+
+        private static string GetDetectorStatus()
+        {
+            var resp = string.Empty;
+            if (Application.Detectors[0] != null && Application.Detectors[1] != null)
+            {
+                resp = Application.Detectors[0].Value.ToString() + ";" + Application.Detectors[1].Value.ToString();
+            }
+            else if (Application.Detectors[0] != null)
+            {
+                resp = Application.Detectors[0].Value.ToString();
+            }
+            else if (Application.Detectors[1] != null)
+            {
+                resp = Application.Detectors[1].Value.ToString();
+            }
+
+            return resp;
         }
 
         private static void TimerCallBackReboot(object state)
@@ -188,15 +252,17 @@ namespace LegoElement
             }
         }
 
-        private static void OnDetection(object sender, int val)
+        private static void OnDetection(object sender, int val, bool detected)
         {
             // Faking calling the API for now
             Debug.WriteLine($"Detected {((Detector)sender).Id}: {val}");
             try
             {
-                //_httpClient ??= new HttpClient();
-                //HttpResponseMessage response = _httpClient.Get($"http://{_legoDiscovery.ServerAddress}:{_appConfiguration.ApiPort}/Api/detect?id={AppConfiguration.DeviceId}&de={((Detector)sender).Id}&va={val}");
-                //response.EnsureSuccessStatusCode();
+                if (_wsServer.ClientsCount > 0)
+                {
+                    string url = $"id={AppConfiguration.DeviceId}&de={((Detector)sender).Id}&va={val}&on={(detected ? "1" : "0")}";
+                    _wsServer.BroadCast(Encoding.UTF8.GetBytes(url));
+                }
             }
             catch (Exception ex)
             {
@@ -230,21 +296,16 @@ namespace LegoElement
 
         private static void ServerCommandReceived(object obj, WebServerEventArgs e)
         {
-            // Not enough memory to handle those!
-            if (e.Context.Request.RawUrl.StartsWith("/style.css"))
+            //check the path of the request
+            if (e.Context.Request.RawUrl == "/")
             {
-                //e.Context.Response.ContentType = "text/css";
-                //WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
-                return;
+                //check if this is a websocket request or a page request 
+                if (e.Context.Request.Headers["Upgrade"] == "websocket")
+                {
+                    //Upgrade to a websocket
+                    _wsServer.AddWebSocket(e.Context);
+                }
             }
-            //else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
-            //{
-            //    var ico = ResourceWeb.GetBytes(ResourceWeb.BinaryResources.favicon);
-            //    e.Context.Response.ContentType = "image/ico";
-            //    e.Context.Response.ContentLength64 = ico.Length;
-            //    e.Context.Response.OutputStream.Write(ico, 0, ico.Length);
-            //    return;
-            //}
 
             if (e.Context.Request.RawUrl.StartsWith("/calibrate"))
             {
@@ -307,15 +368,16 @@ namespace LegoElement
                 toOutput += "</form>";
                 toOutput += $"Return to the <a href=\"http://{Wireless80211.GetCurrentIPAddress()}\">home page</a>.";
                 toOutput += "</body></html>";
-                WebServer.OutPutStream(e.Context.Response, toOutput);
+                WebServer.OutputAsStream(e.Context.Response, toOutput);
                 return;
             }
 
             if (_wifiApMode)
             {
                 WebServerCommon.SetupWifi(e);
+                return;
             }
-            else
+            else if (e.Context.Request.RawUrl == "/")
             {
                 string toOutput = "<html><head><title>Lego Train Detector</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>";
                 if (AppConfiguration.FirstDetectorActivated)
@@ -341,9 +403,11 @@ namespace LegoElement
                 toOutput += "To configure your device please go to <a href=\"/config\">configuration</a>.<br/>";
                 toOutput += "Reset your wifi by cliking <a href=\"/resetwifi\">here</a>.<br>";
                 toOutput += "</body></html>";
-                WebServer.OutPutStream(e.Context.Response, toOutput);
+                WebServer.OutputAsStream(e.Context.Response, toOutput);
                 return;
             }
+
+            WebServerCommon.ServeStaticFiles(e);
         }
     }
 }

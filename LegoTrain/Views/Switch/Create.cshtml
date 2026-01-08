@@ -2,36 +2,156 @@
 
 <h2>Create a new switch</h2>
 
-<form asp-action="Create">
-    <div class="form-group">
-        <label asp-for="Id" class="control-label"></label>
-        <input asp-for="Id" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Name" class="control-label"></label>
-        <input asp-for="Name" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="X" class="control-label"></label>
-        <input asp-for="X" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Y" class="control-label"></label>
-        <input asp-for="Y" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="Rotation" class="control-label"></label>
-        <input asp-for="Rotation" class="form-control" />
-    </div>
-    <div class="form-group">
-        <label asp-for="IsLeft" class="control-label"></label>
-        <input asp-for="IsLeft" type="checkbox" class="form-check-label" />
-    </div>
-    <div class="form-group">
-        <input type="submit" value="Create" class="btn btn-primary" />
-    </div>
-</form>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input asp-for="Id" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="X" class="control-label"></label>
+                <input asp-for="X" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Y" class="control-label"></label>
+                <input asp-for="Y" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Rotation" class="control-label"></label>
+                <input asp-for="Rotation" class="form-control" />
+                <input type="range" id="rotationSlider" min="0" max="360" value="0" class="form-range mt-2" />
+            </div>
+            <div class="form-group">
+                <label asp-for="IsLeft" class="control-label"></label>
+                <input asp-for="IsLeft" type="checkbox" class="form-check-label" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+        <div>
+            <a asp-action="Index">Back to List</a>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div style="position: relative; display: inline-block;">
+            <img id="circuitMap" src="/config/circuit.png" alt="Circuit Map" style="max-width: 100%; border: 1px solid #ccc;" />
+            <img id="switchIcon" src="/config/switch-left-str.png" alt="Switch" style="position: absolute; cursor: move;" />
+        </div>
+        <div class="mt-2">
+            <small class="text-muted">Drag the switch icon to position it. Use the rotation slider or input to rotate. Toggle the checkbox to change switch type (left/right).</small>
+        </div>
+    </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let isDragging = false;
+    const switchIcon = document.getElementById('switchIcon');
+    const circuitMap = document.getElementById('circuitMap');
+    const xInput = document.getElementById('X');
+    const yInput = document.getElementById('Y');
+    const rotationInput = document.getElementById('Rotation');
+    const rotationSlider = document.getElementById('rotationSlider');
+    const isLeftCheck = document.getElementById('IsLeft');
+
+    if (!switchIcon || !circuitMap || !xInput || !yInput || !rotationInput || !rotationSlider || !isLeftCheck) {
+        console.error('Some required elements were not found');
+        return;
+    }
+
+        function updatePosition() {
+            const x = parseInt(xInput.value) || 0;
+            const y = parseInt(yInput.value) || 0;
+            
+            // Scale coordinates to displayed size
+            const scale = circuitMap.clientWidth / circuitMap.naturalWidth;
+            const displayX = x * scale;
+            const displayY = y * scale;
+            
+            switchIcon.style.left = displayX + 'px';
+            switchIcon.style.top = displayY + 'px';
+            
+            // Scale icon size to match map scale
+            const iconWidth = switchIcon.naturalWidth * scale;
+            const iconHeight = switchIcon.naturalHeight * scale;
+            switchIcon.style.width = iconWidth + 'px';
+            switchIcon.style.height = iconHeight + 'px';
+        }
+
+    function updateRotation() {
+        const rotation = parseInt(rotationInput.value) || 0;
+        switchIcon.style.transform = `rotate(${rotation}deg)`;
+        switchIcon.style.transformOrigin = 'center';
+        rotationSlider.value = rotation;
+    }
+
+    function updateSwitchImage() {
+        const isLeft = isLeftCheck.checked;
+        const type = isLeft ? 'left' : 'right';
+        switchIcon.src = `/config/switch-${type}-str.png`;
+    }
+
+    switchIcon.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        e.preventDefault();
+    });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const rect = circuitMap.getBoundingClientRect();
+            const x = e.clientX - rect.left - (switchIcon.width / 2);
+            const y = e.clientY - rect.top - (switchIcon.height / 2);
+            
+            const clampedX = Math.max(0, Math.min(x, rect.width - switchIcon.width));
+            const clampedY = Math.max(0, Math.min(y, rect.height - switchIcon.height));
+            
+            // Convert displayed coordinates to natural image coordinates
+            const scale = circuitMap.clientWidth / circuitMap.naturalWidth;
+            const naturalX = Math.round(clampedX / scale);
+            const naturalY = Math.round(clampedY / scale);
+            
+            xInput.value = naturalX;
+            yInput.value = naturalY;
+            updatePosition();
+        });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+    });
+
+        xInput.addEventListener('input', updatePosition);
+        yInput.addEventListener('input', updatePosition);
+        rotationInput.addEventListener('input', () => {
+            rotationSlider.value = rotationInput.value;
+            updateRotation();
+        });
+        rotationSlider.addEventListener('input', () => {
+            rotationInput.value = rotationSlider.value;
+            updateRotation();
+        });
+        isLeftCheck.addEventListener('change', updateSwitchImage);
+
+        // Initialize after image loads
+        function initialize() {
+            updatePosition();
+            updateRotation();
+            updateSwitchImage();
+        }
+        
+        if (switchIcon.complete && switchIcon.naturalWidth > 0) {
+            initialize();
+        } else {
+            switchIcon.addEventListener('load', initialize);
+        }
+        
+        circuitMap.addEventListener('load', updatePosition);
+    });
+</script>

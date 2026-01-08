@@ -9,6 +9,9 @@ using System.Net.Sockets;
 
 namespace LegoTrain.Services
 {
+    /// <summary>
+    /// Manages device discovery on the Lego train network using UDP broadcast messages.
+    /// </summary>
     public class LegoDiscovery : IDisposable
     {
         private const int BindingPort = 2024;
@@ -19,8 +22,30 @@ namespace LegoTrain.Services
         private CancellationTokenSource _runReceiveToken;
         private List<DeviceDetails> _deviceDetails = new List<DeviceDetails>();
 
+        /// <summary>
+        /// Gets the list of discovered devices.
+        /// </summary>
         public List<DeviceDetails> DeviceDetails => _deviceDetails;
 
+        /// <summary>
+        /// Delegate for device events.
+        /// </summary>
+        /// <param name="device">The device that triggered the event.</param>
+        public delegate void DeviceEvent(DeviceDetails device);
+        /// <summary>
+        /// Event raised when a device joins the network.
+        /// </summary>
+        public event DeviceEvent OnDeviceJoined;
+
+        /// <summary>
+        /// Event raised when a device leaves the network.
+        /// </summary>
+        public event DeviceEvent OnDeviceLeft;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LegoDiscovery"/> class.
+        /// </summary>
+        /// <param name="update">The time interval for sending discovery messages. Defaults to 1 minute.</param>
         public LegoDiscovery(TimeSpan update = default)
         {
             _udpClient = new UdpClient();
@@ -45,8 +70,7 @@ namespace LegoTrain.Services
                         if ((DateTimeOffset.UtcNow - _deviceDetails[i].LastUpdate).TotalMilliseconds > update.TotalMilliseconds * 3)
                         {
                             _deviceDetails[i].DeviceStatus = DeviceStatus.Absent;
-                            // TODO: Send event
-
+                            OnDeviceLeft?.Invoke(_deviceDetails[i]);
                             _deviceDetails.Remove(_deviceDetails[i]);
                         }
                     }
@@ -83,9 +107,9 @@ namespace LegoTrain.Services
                             if (oldDevDeatils != null)
                             {
                                 _deviceDetails.Remove(oldDevDeatils);
-                                // TODO: notify with event
                                 oldDevDeatils.DeviceStatus = DeviceStatus.Laaving;
                                 oldDevDeatils.LastUpdate = DateTimeOffset.UtcNow;
+                                OnDeviceLeft?.Invoke(oldDevDeatils);
                             }
 
                             continue;
@@ -109,6 +133,7 @@ namespace LegoTrain.Services
                                 oldDevDeatils.DeviceCapacity = devDetails.DeviceCapacity;
                                 oldDevDeatils.DeviceStatus = DeviceStatus.Joining;
                                 // TODO Send notification
+                                OnDeviceJoined?.Invoke(oldDevDeatils);
                             }
                         }
                         else
@@ -116,6 +141,7 @@ namespace LegoTrain.Services
                             // TODO Send notification
                             devDetails.LastUpdate = DateTimeOffset.UtcNow;
                             _deviceDetails.Add(devDetails);
+                            OnDeviceJoined?.Invoke(devDetails);
                         }
                     }
                     catch (Exception ex)
@@ -129,6 +155,9 @@ namespace LegoTrain.Services
             _runDiscovery.Start();
         }
 
+        /// <summary>
+        /// Releases all resources used by the discovery service.
+        /// </summary>
         public void Dispose()
         {
             _runDiscoToken?.Cancel();
@@ -138,11 +167,14 @@ namespace LegoTrain.Services
             _runReceive?.Join();
         }
 
+        /// <summary>
+        /// Sends a discovery broadcast message to find devices on the network.
+        /// </summary>
         public void SendDiscovery()
         {
             try
             {
-                var data = DiscoveryMessage.CreateMessage(DiscoveryMessageType.Discovery, 0, null, null);
+                var data = DiscoveryMessage.CreateMessage(DiscoveryMessageType.Discovery, 0, null!, null!);
                 _udpClient.Send(data, data.Length, "255.255.255.255", BindingPort);
             }
             catch (Exception ex)

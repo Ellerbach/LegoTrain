@@ -13,10 +13,20 @@ using System.Threading;
 
 namespace SharedServices.Controllers
 {
+    /// <summary>
+    /// Controller for handling configuration web pages on nanoFramework devices.
+    /// </summary>
     internal class ConfigurationController
     {
+        /// <summary>
+        /// Gets or sets the application configuration instance.
+        /// </summary>
         public static IAppConfiguration AppConfiguration { get; set; }
 
+        /// <summary>
+        /// Displays the configuration page for editing device settings.
+        /// </summary>
+        /// <param name="e">The web server event arguments.</param>
         [Route("config")]
         public void Config(WebServerEventArgs e)
         {
@@ -71,9 +81,13 @@ namespace SharedServices.Controllers
             hiddenBool += hiddenBool.TrimEnd(';') + "\"/>";
             route += hiddenBool;
             route += "<input type=\"submit\" value=\"Save\"></fieldset></form><br>Device ID should start at 1.</body></html>";
-            WebServer.OutPutStream(e.Context.Response, route);
+            WebServer.OutputAsStream(e.Context.Response, route);
         }
 
+        /// <summary>
+        /// Processes the configuration form submission and saves the settings.
+        /// </summary>
+        /// <param name="e">The web server event arguments.</param>
         [Route("process")]
         [Method("POST")]
         public void Process(WebServerEventArgs e)
@@ -150,9 +164,13 @@ namespace SharedServices.Controllers
             nanoFramework.Runtime.Native.GC.Run(true);
             AppConfiguration.Save();
             string route = $"<!DOCTYPE html><html><head><title>Lego Element Configuration Page</title><link rel=\"stylesheet\" href=\"style.css\"></head><body>Configuration saved and updated. Return to the <a href=\"http://{Wireless80211.GetCurrentIPAddress()}\">home page</a>.</body></html>";
-            WebServer.OutPutStream(e.Context.Response, route);
+            WebServer.OutputAsStream(e.Context.Response, route);
         }
 
+        /// <summary>
+        /// Displays the WiFi reset page and starts the Access Point mode.
+        /// </summary>
+        /// <param name="e">The web server event arguments.</param>
         [Route("resetwifi")]
         public void ResetWifi(WebServerEventArgs e)
         {
@@ -166,17 +184,21 @@ namespace SharedServices.Controllers
                     "<input type='submit' value='Save'>" +
                     "</fieldset>" +
                     "</form></body></html>";
-            WebServer.OutPutStream(e.Context.Response, route);
+            WebServer.OutputAsStream(e.Context.Response, route);
             WirelessAP.SetWifiAp();
         }
 
+        /// <summary>
+        /// Reboots the device after displaying a confirmation page.
+        /// </summary>
+        /// <param name="e">The web server event arguments.</param>
         [Route("reboot")]
         public void Reboot(WebServerEventArgs e)
         {
             string route = $"<!DOCTYPE html><html><head><title>Reboot</title></head><body>" +
                 "<meta http-equiv=\"refresh\" content=\"0; url=/\" />" +
                 "</body></html>";
-            WebServer.OutPutStream(e.Context.Response, route);
+            WebServer.OutputAsStream(e.Context.Response, route);
             Sleep.EnableWakeupByTimer(new System.TimeSpan(0, 0, 0, 1));
             Sleep.StartDeepSleep();
         }

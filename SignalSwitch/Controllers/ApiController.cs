@@ -59,7 +59,7 @@ namespace LegoElement.Controllers
         [Route("signalstatus")]
         public void SignalStatus(WebServerEventArgs e)
         {
-            WebServer.OutPutStream(e.Context.Response, Application.Signal.State.ToString());
+            WebServer.OutputAsStream(e.Context.Response, Application.Signal.State.ToString());
         }
 
         [Route("switch")]
@@ -107,7 +107,7 @@ namespace LegoElement.Controllers
         [Route("switchstatus")]
         public void SwitchStatus(WebServerEventArgs e)
         {
-            WebServer.OutPutStream(e.Context.Response, Application.Switch.IsStraight ? "0" : "1");
+            WebServer.OutputAsStream(e.Context.Response, Application.Switch.IsStraight ? "0" : "1");
         }
 
         private static bool TryConvertInt32(string val, out int result, int min, int max)

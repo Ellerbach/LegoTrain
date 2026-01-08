@@ -111,7 +111,7 @@ namespace LegoElement
             if (e.Context.Request.RawUrl.StartsWith("/style.css"))
             {
                 e.Context.Response.ContentType = "text/css";
-                WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
+                WebServer.OutputAsStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
                 return;
             }
             //else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
@@ -137,7 +137,7 @@ namespace LegoElement
                 toOutput += "To configure your device please go to <a href=\"config\">configuration</a><br/>";
                 toOutput += "Reset your wifi by cliking <a href=\"resetwifi\">here</a>.";
                 toOutput += "</body></html>";
-                WebServer.OutPutStream(e.Context.Response, toOutput);
+                WebServer.OutputAsStream(e.Context.Response, toOutput);
             }
         }
 

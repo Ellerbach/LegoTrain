@@ -5,16 +5,28 @@ using LegoTrain.Models;
 
 namespace LegoTrain.Services
 {
+    /// <summary>
+    /// Manages signal devices by sending HTTP commands to control their state.
+    /// </summary>
     public class SignalManagement : ISignalManagement, IDisposable
     {
         private static readonly HttpClient _client = new HttpClient();
         private LegoDiscovery _disco;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SignalManagement"/> class.
+        /// </summary>
+        /// <param name="legoDiscovery">The device discovery service.</param>
         public SignalManagement(LegoDiscovery legoDiscovery)
         {
             _disco = legoDiscovery;
         }
 
+        /// <summary>
+        /// Changes the state of a signal by sending an HTTP request to the signal device.
+        /// </summary>
+        /// <param name="numSignal">The signal number.</param>
+        /// <param name="value">The new signal state.</param>
         public void ChangeSignal(byte numSignal, SignalState value)
         {
             try
@@ -28,6 +40,11 @@ namespace LegoTrain.Services
             }
         }
 
+        /// <summary>
+        /// Gets the current state of a signal by querying the signal device.
+        /// </summary>
+        /// <param name="numSignal">The signal number.</param>
+        /// <returns>The current signal state.</returns>
         public SignalState GetSignal(byte numSignal)
         {
             int state = 0;
@@ -49,6 +66,9 @@ namespace LegoTrain.Services
             return (SignalState)state;
         }
 
+        /// <summary>
+        /// Releases all resources used by the signal management service.
+        /// </summary>
         public void Dispose()
         {
             // Nothing
