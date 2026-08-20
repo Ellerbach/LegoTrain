@@ -90,13 +90,13 @@ namespace LegoTrain.Controllers
                 return BadRequest();
             }
 
-            if (de < 0 || va < 0)
+            if (id < 0 || de < 0 || va < 0)
             {
                 return BadRequest();
             }
 
             var detectorManager = (DetectorManagement)_config.DetectorManagement;
-            detectorManager.UpdateDetectorState(de, va, true);
+            detectorManager.UpdateDetectorState(id, de, va, true);
             return Ok();
         }
 

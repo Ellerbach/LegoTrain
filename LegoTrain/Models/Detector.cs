@@ -11,9 +11,15 @@ namespace LegoTrain.Models
     public class Detector
     {
         /// <summary>
-        /// Gets or sets the unique identifier for the detector.
+        /// Gets or sets the device identifier that owns this detector channel.
         /// </summary>
-        [Display(Name = "Dector's ID")]
+        [Display(Name = "Device ID")]
+        public int DeviceId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the local detector channel identifier on the device.
+        /// </summary>
+        [Display(Name = "Detector's ID")]
         public int Id { get; set; }
 
         /// <summary>

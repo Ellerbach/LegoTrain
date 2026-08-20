@@ -16,6 +16,7 @@ namespace LegoTrain.Services
     {
         private static readonly HttpClient _client = new HttpClient();
         private readonly AppConfiguration _config;
+        private readonly object _devicesLock = new object();
         private LegoDiscovery _disco;
         private Dictionary<Detector, CancellationTokenSource> _devices = new Dictionary<Detector, CancellationTokenSource>();
 
@@ -36,14 +37,23 @@ namespace LegoTrain.Services
         {
             if (device.DeviceCapacity.HasFlag(DeviceCapability.Detector) || device.DeviceCapacity.HasFlag(DeviceCapability.DoubleDetector))
             {
-                for (int i = 0; i < _devices.Count; i++)
+                List<CancellationTokenSource> toCancel = new List<CancellationTokenSource>();
+
+                lock (_devicesLock)
                 {
-                    if (_devices.ElementAt(i).Key.Id == device.Id)
+                    foreach (var pair in _devices)
                     {
-                        _devices.TryGetValue(_devices.ElementAt(i).Key, out CancellationTokenSource? token);
-                        token?.Cancel();
-                        _devices.Remove(_devices.ElementAt(i).Key);
+                        if (pair.Key.Id == device.Id)
+                        {
+                            toCancel.Add(pair.Value);
+                            _devices.Remove(pair.Key);
+                        }
                     }
+                }
+
+                foreach (var token in toCancel)
+                {
+                    token.Cancel();
                 }
             }
         }
@@ -57,7 +67,12 @@ namespace LegoTrain.Services
                 detector.IsConnected = device.DeviceStatus == DeviceStatus.Joining;
                 detector.Id = device.Id;
                 var token = new CancellationTokenSource();
-                _devices.TryAdd(detector, token);
+
+                lock (_devicesLock)
+                {
+                    _devices[detector] = token;
+                }
+
                 Task.Run(async () => await ConnectAndStart(device, token));
             }
         }
@@ -70,23 +85,26 @@ namespace LegoTrain.Services
         /// <summary>
         /// Updates the detector model and raises the event for the reported detector state.
         /// </summary>
-        /// <param name="detectorId">The detector identifier.</param>
+        /// <param name="deviceId">The owning device identifier.</param>
+        /// <param name="detectorId">The local detector channel identifier on the device.</param>
         /// <param name="value">The reported detector value.</param>
         /// <param name="triggered">Whether the detector is active.</param>
-        public void UpdateDetectorState(int detectorId, int value, bool triggered)
+        public void UpdateDetectorState(int deviceId, int detectorId, int value, bool triggered)
         {
-            var detector = _config.Detectors.FirstOrDefault(d => d.Id == detectorId);
+            var detector = _config.Detectors.FirstOrDefault(d => d.DeviceId == deviceId && d.Id == detectorId);
             if (detector == null)
             {
                 detector = new Detector
                 {
+                    DeviceId = deviceId,
                     Id = detectorId,
-                    Name = $"Detector {detectorId}",
+                    Name = $"Detector {deviceId}:{detectorId}",
                     IsConnected = true
                 };
                 _config.Detectors.Add(detector);
             }
 
+            detector.DeviceId = deviceId;
             detector.Value = value;
             detector.Triggered = triggered;
             detector.IsConnected = true;
@@ -137,15 +155,17 @@ namespace LegoTrain.Services
                         }
                     }
 
-                    if (payload.TryGetValue("de", out var detectorIdText)
+                    if (payload.TryGetValue("id", out var deviceIdText)
+                        && payload.TryGetValue("de", out var detectorIdText)
                         && payload.TryGetValue("va", out var valueText)
+                        && int.TryParse(deviceIdText, out var deviceId)
                         && int.TryParse(detectorIdText, out var detectorId)
                         && int.TryParse(valueText, out var value))
                     {
                         var triggered = payload.TryGetValue("on", out var stateText)
                             && int.TryParse(stateText, out var state)
                             && state != 0;
-                        UpdateDetectorState(detectorId, value, triggered);
+                        UpdateDetectorState(deviceId, detectorId, value, triggered);
                     }
                 }
 
@@ -160,9 +180,21 @@ namespace LegoTrain.Services
         /// </summary>
         public void Dispose()
         {
-            foreach (var device in _devices)
+            List<CancellationTokenSource> toCancel = new List<CancellationTokenSource>();
+
+            lock (_devicesLock)
             {
-                device.Value.Cancel();
+                foreach (var pair in _devices)
+                {
+                    toCancel.Add(pair.Value);
+                }
+
+                _devices.Clear();
+            }
+
+            foreach (var token in toCancel)
+            {
+                token.Cancel();
             }
         }
 
@@ -172,13 +204,23 @@ namespace LegoTrain.Services
         /// <param name="device">The device to stop monitoring.</param>
         public void Stop(DeviceDetails device)
         {
-            for (int i = 0; i < _devices.Count; i++)
+            List<CancellationTokenSource> toCancel = new List<CancellationTokenSource>();
+
+            lock (_devicesLock)
             {
-                if (_devices.ElementAt(i).Key.Id == device.Id)
+                foreach (var pair in _devices)
                 {
-                    _devices.TryGetValue(_devices.ElementAt(i).Key, out CancellationTokenSource? token);
-                    token?.Cancel();
+                    if (pair.Key.Id == device.Id)
+                    {
+                        toCancel.Add(pair.Value);
+                        _devices.Remove(pair.Key);
+                    }
                 }
+            }
+
+            foreach (var token in toCancel)
+            {
+                token.Cancel();
             }
         }
     }

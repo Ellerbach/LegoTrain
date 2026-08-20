@@ -198,17 +198,18 @@ namespace LegoElement
         private static void OnConfigurationUpdated(object sender, ConfigurationEventArgs e)
         {
             Debug.WriteLine($"Parameter updated: {e.ParamName}");
-            // Check the mode
-            if (e.ParamName.StartsWith("Detector1"))
+
+            if (e.ParamName == nameof(AppConfiguration.Detector1Pin))
             {
                 SetDetector(0);
+                SetThreashold();
             }
-            else if (e.ParamName.StartsWith("Detector2"))
+            else if (e.ParamName == nameof(AppConfiguration.Detector2Pin))
             {
                 SetDetector(1);
+                SetThreashold();
             }
-
-            if (e.ParamName.EndsWith("Threshold"))
+            else if (e.ParamName.EndsWith("Threshold"))
             {
                 SetThreashold();
             }
