@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "type": "nanoframework",
+            "request": "launch",
+            "name": "nanoFramework: Launch and Debug",
+            "program": "C:\\Repos\\LegoTrain\\SignalSwitch\\bin\\Debug",
+            "device": "COM3",
+            "stopOnEntry": true,
+            "deployAssemblies": true
+        },
+        {
+            "type": "nanoframework",
+            "request": "launch",
+            "name": "nanoFramework: Launch and Debug",
+            "program": "${workspaceFolder}/bin/Debug/${workspaceFolderBasename}.pe",
+            "device": "",
+            "stopOnEntry": true,
+            "deployAssemblies": true
+        },
+        {
+            "type": "nanoframework",
+            "request": "attach",
+            "name": "nanoFramework: Attach to Device",
+            "device": "",
+            "program": "${workspaceFolder}/bin/Debug"
+        }
+    ]
+}

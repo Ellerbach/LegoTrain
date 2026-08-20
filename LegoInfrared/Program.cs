@@ -1,7 +1,9 @@
+// Licensed to the Laurent Ellerbach under one or more agreements.
+// Laurent Ellerbach licenses this file to you under the MIT license.
+
 using LegoElement.Controllers;
 using LegoElement.Models;
 using LegoElement.Services;
-using LegoInfrared;
 using nanoDiscovery.Common;
 using nanoFramework.Hardware.Esp32;
 using nanoFramework.WebServer;
@@ -110,20 +112,14 @@ namespace LegoElement
         {
             if (e.Context.Request.RawUrl.StartsWith("/style.css"))
             {
-                e.Context.Response.ContentType = "text/css";
-                WebServer.OutputAsStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
+                WebServer.SendFileOverHTTP(e.Context.Response, "I:\\Resources\\style.css", "text/css");
                 return;
             }
-            //else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
-            //{
-            //    Debug.WriteLine("before favion.ico");
-            //    var ico = ResourceWeb.GetBytes(ResourceWeb.BinaryResources.favicon);
-            //    e.Context.Response.ContentType = "image/ico";
-            //    e.Context.Response.ContentLength64 = ico.Length;
-            //    e.Context.Response.OutputStream.Write(ico, 0, ico.Length);
-            //    Debug.WriteLine("After favion.ico");
-            //    return;
-            //}
+            else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
+            {
+                WebServer.SendFileOverHTTP(e.Context.Response, "I:\\Resources\\favicon.ico", "image/ico");
+                return;
+            }
 
             if (_wifiApMode)
             {
