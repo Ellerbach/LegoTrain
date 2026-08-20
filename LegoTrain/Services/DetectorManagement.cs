@@ -15,6 +15,7 @@ namespace LegoTrain.Services
     public class DetectorManagement : IDetectorManagement, IDisposable
     {
         private static readonly HttpClient _client = new HttpClient();
+        private readonly AppConfiguration _config;
         private LegoDiscovery _disco;
         private Dictionary<Detector, CancellationTokenSource> _devices = new Dictionary<Detector, CancellationTokenSource>();
 
@@ -22,9 +23,11 @@ namespace LegoTrain.Services
         /// Initializes a new instance of the <see cref="DetectorManagement"/> class.
         /// </summary>
         /// <param name="legoDiscovery">The device discovery service.</param>
-        public DetectorManagement(LegoDiscovery legoDiscovery)
+        /// <param name="config">The application configuration containing the detector list.</param>
+        public DetectorManagement(LegoDiscovery legoDiscovery, AppConfiguration config)
         {
             _disco = legoDiscovery;
+            _config = config;
             _disco.OnDeviceJoined += OnDeviceJoined;
             _disco.OnDeviceLeft += OnDeviceLeft;
         }
@@ -65,6 +68,32 @@ namespace LegoTrain.Services
         public event IDetectorManagement.DetectorEvent OnDetectorEvent;
 
         /// <summary>
+        /// Updates the detector model and raises the event for the reported detector state.
+        /// </summary>
+        /// <param name="detectorId">The detector identifier.</param>
+        /// <param name="value">The reported detector value.</param>
+        /// <param name="triggered">Whether the detector is active.</param>
+        public void UpdateDetectorState(int detectorId, int value, bool triggered)
+        {
+            var detector = _config.Detectors.FirstOrDefault(d => d.Id == detectorId);
+            if (detector == null)
+            {
+                detector = new Detector
+                {
+                    Id = detectorId,
+                    Name = $"Detector {detectorId}",
+                    IsConnected = true
+                };
+                _config.Detectors.Add(detector);
+            }
+
+            detector.Value = value;
+            detector.Triggered = triggered;
+            detector.IsConnected = true;
+            OnDetectorEvent?.Invoke(detector);
+        }
+
+        /// <summary>
         /// Connects to a detector device via WebSocket and starts receiving detection events.
         /// </summary>
         /// <param name="device">The device to connect to.</param>
@@ -87,10 +116,37 @@ namespace LegoTrain.Services
                 byte[] buffer = new byte[1024];
                 while (!token.IsCancellationRequested)
                 {
-                    // Receiving a message from the server                    
+                    // Receiving a message from the server
                     WebSocketReceiveResult result = await client.ReceiveAsync(new ArraySegment<byte>(buffer), token.Token);
                     string receivedMessage = Encoding.UTF8.GetString(buffer, 0, result.Count);
                     Console.WriteLine("Message received from the server: " + receivedMessage);
+
+                    if (string.IsNullOrWhiteSpace(receivedMessage))
+                    {
+                        continue;
+                    }
+
+                    var keyValues = receivedMessage.Split('&');
+                    var payload = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                    foreach (var item in keyValues)
+                    {
+                        var parts = item.Split('=', 2);
+                        if (parts.Length == 2)
+                        {
+                            payload[parts[0]] = parts[1];
+                        }
+                    }
+
+                    if (payload.TryGetValue("de", out var detectorIdText)
+                        && payload.TryGetValue("va", out var valueText)
+                        && int.TryParse(detectorIdText, out var detectorId)
+                        && int.TryParse(valueText, out var value))
+                    {
+                        var triggered = payload.TryGetValue("on", out var stateText)
+                            && int.TryParse(stateText, out var state)
+                            && state != 0;
+                        UpdateDetectorState(detectorId, value, triggered);
+                    }
                 }
 
                 // Closing the connection

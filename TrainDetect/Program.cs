@@ -55,25 +55,25 @@ namespace LegoElement
                 _appConfiguration.Detector2Pin = 10;
                 _appConfiguration.Detector1MinimumThreshold = 100;
                 _appConfiguration.Detector1MaximumThreshold = 200;
+                _appConfiguration.Detector2MinimumThreshold = 100;
+                _appConfiguration.Detector2MaximumThreshold = 200;
                 _appConfiguration.ApiPort = 8080;
                 _appConfiguration.Save();
             }
-            else
-            {
-                SetDetector(0);
-                SetDetector(1);
-                SetThreashold();
-                if (_appConfiguration.StartDetectionAutomatically)
-                {
-                    if (Detectors[0] != null)
-                    {
-                        Detectors[0].Detect = true;
-                    }
 
-                    if (Detectors[1] != null)
-                    {
-                        Detectors[1].Detect = true;
-                    }
+            SetDetector(0);
+            SetDetector(1);
+            SetThreashold();
+            if (_appConfiguration.StartDetectionAutomatically)
+            {
+                if (Detectors[0] != null)
+                {
+                    Detectors[0].Detect = true;
+                }
+
+                if (Detectors[1] != null)
+                {
+                    Detectors[1].Detect = true;
                 }
             }
 
@@ -217,10 +217,23 @@ namespace LegoElement
             {
                 SetDiscovery();
             }
-            else
+
+            if (e.ParamName == nameof(AppConfiguration.LedGpio))
             {
-                _blinky?.Dispose();
-                _blinky.BlinkNormal();
+                if (_blinky != null)
+                {
+                    _blinky.Dispose();
+                }
+
+                _blinky = new Blinky(_appConfiguration.LedGpio);
+                if (_wifiApMode)
+                {
+                    _blinky.BlinkWaiWifi();
+                }
+                else
+                {
+                    _blinky.BlinkNormal();
+                }
             }
         }
 
@@ -240,6 +253,8 @@ namespace LegoElement
 
         private static void SetDetector(int decNum)
         {
+            Detectors[decNum]?.Dispose();
+            Detectors[decNum] = null;
             try
             {
                 Detector detector = new Detector(decNum == 0 ? AppConfiguration.Detector1Pin : AppConfiguration.Detector2Pin, decNum);
@@ -322,7 +337,7 @@ namespace LegoElement
 
                     if (Detectors[1] != null)
                     {
-                        AppConfiguration.Detector2MinimumThreshold = Detectors[0].Value;
+                        AppConfiguration.Detector2MinimumThreshold = Detectors[1].Value;
                         detectorStatus += $"Second Detector: {AppConfiguration.Detector2MinimumThreshold} with light.<br/>";
                     }
 
@@ -339,7 +354,7 @@ namespace LegoElement
 
                     if (Detectors[1] != null)
                     {
-                        AppConfiguration.Detector2MaximumThreshold = Detectors[0].Value;
+                        AppConfiguration.Detector2MaximumThreshold = Detectors[1].Value;
                         detectorStatus += $"Second Detector: {AppConfiguration.Detector2MaximumThreshold} with train.<br/>";
                     }
 

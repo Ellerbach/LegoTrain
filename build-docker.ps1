@@ -82,8 +82,14 @@ try {
         Write-Host ""
         Write-Host "Preparing to push image to registry..." -ForegroundColor Cyan
         
-        # Extract registry hostname (everything before the first slash, or docker.io if no slash)
-        $registryHost = if ($Registry -match '^([^/]+)/') { $matches[1] } else { "docker.io" }
+        # A prefix is a registry host only when it looks like a domain, host:port, or localhost.
+        $registryHost = "docker.io"
+        if ($Registry -match '^([^/]+)/') {
+            $registryPrefix = $matches[1]
+            if ($registryPrefix -eq "localhost" -or $registryPrefix -match '[.:]') {
+                $registryHost = $registryPrefix
+            }
+        }
         
         # Check if already logged in by attempting to get auth token
         Write-Host "Checking authentication for registry: $registryHost" -ForegroundColor Yellow

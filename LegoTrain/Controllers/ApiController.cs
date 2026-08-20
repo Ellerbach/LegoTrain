@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using LegoTrain.Models;
+using LegoTrain.Services;
 using Lego.Infrared;
 using nanoDiscovery.Common;
 
@@ -84,6 +85,18 @@ namespace LegoTrain.Controllers
         [HttpGet(PageDetect)]
         public IActionResult Detect(int id, int de, int va)
         {
+            if (_config.DetectorManagement == null)
+            {
+                return BadRequest();
+            }
+
+            if (de < 0 || va < 0)
+            {
+                return BadRequest();
+            }
+
+            var detectorManager = (DetectorManagement)_config.DetectorManagement;
+            detectorManager.UpdateDetectorState(de, va, true);
             return Ok();
         }
 

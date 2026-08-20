@@ -51,7 +51,7 @@ docker run -d \
   --name legotrain \
   --restart unless-stopped \
   --network host \
-  -v $(pwd)/config:/app/config \
+  -v $(pwd)/LegoTrain/config:/app/config \
   ellerbach/legotrain:arm32-1.0
 ```
 

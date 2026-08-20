@@ -18,6 +18,7 @@ namespace SharedServices.Services
     /// </summary>
     public static class WebServerCommon
     {
+        private const string StaticFilesRoot = "I:\\Resources\\";
         private static ArrayList _files = new ArrayList();
 
         /// <summary>
@@ -98,26 +99,22 @@ namespace SharedServices.Services
         public static void PopulateFiles()
         {
             _files.Clear();
-            // list all files in directories and subdirectories of I:\ drive
-            ListFiles("I:\\");
+            ListFiles(StaticFilesRoot);
         }
 
         private static void ListFiles(string directory)
         {
             try
             {
-                // Get all files in the current directory
                 string[] files = Directory.GetFiles(directory);
                 foreach (string file in files)
                 {
                     _files.Add(file);
                 }
 
-                // Get all subdirectories in the current directory
                 string[] subdirectories = Directory.GetDirectories(directory);
                 foreach (string subdirectory in subdirectories)
                 {
-                    // Recursively list files in each subdirectory
                     ListFiles(subdirectory);
                 }
             }
@@ -128,18 +125,24 @@ namespace SharedServices.Services
         }
 
         /// <summary>
-        /// Serves static files from the I:\ drive.
+        /// Serves static files from the dedicated resource directory.
         /// </summary>
         /// <param name="e">The web server event arguments.</param>
         public static void ServeStaticFiles(WebServerEventArgs e)
         {
-            string path = e.Context.Request.RawUrl;
+            string path = e.Context.Request.RawUrl ?? string.Empty;
 
             try
             {
-                var file = $"I:\\{ReplaceSlashWithBackslash(path.Substring(1))}";
-                // Checks if the file exists in the list
-                if (!_files.Contains(file))
+                string relativePath = ReplaceSlashWithBackslash(path.TrimStart('/'));
+                if (string.IsNullOrEmpty(relativePath) || relativePath.Contains("..") || relativePath.Contains(":"))
+                {
+                    WebServer.OutputAsStream(e.Context.Response, "File not found");
+                    return;
+                }
+
+                string file = StaticFilesRoot + relativePath;
+                if (!file.StartsWith(StaticFilesRoot) || !_files.Contains(file))
                 {
                     WebServer.OutputAsStream(e.Context.Response, "File not found");
                     return;

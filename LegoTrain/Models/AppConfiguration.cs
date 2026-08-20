@@ -115,7 +115,7 @@ namespace LegoTrain.Models
 
             try
             {
-                DetectorManagement = new DetectorManagement(Discovery);
+                DetectorManagement = new DetectorManagement(Discovery, this);
             }
             catch
             {

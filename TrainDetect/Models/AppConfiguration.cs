@@ -207,7 +207,7 @@ namespace LegoElement.Models
                 }
 
                 _detector2MinThreshold = value;
-                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(Detector1MinimumThreshold)));
+                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(Detector2MinimumThreshold)));
             }
         }
 
@@ -225,7 +225,7 @@ namespace LegoElement.Models
                 }
 
                 _detector2MaxThreshold = value;
-                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(Detector1MaximumThreshold)));
+                OnConfigurationUpdated?.Invoke(this, new ConfigurationEventArgs(nameof(Detector2MaximumThreshold)));
             }
         }
 

@@ -18,6 +18,7 @@ namespace LegoElement.Models
         private AdcController _controller = new AdcController();
         private AdcChannel _channel;
         private Thread _thread;
+        private volatile bool _running;
 
         /// <summary>
         /// Delegate for detector events.
@@ -62,10 +63,33 @@ namespace LegoElement.Models
 
             Detect = false;
             IsDetected = false;
+            Start();
+        }
 
+        /// <summary>
+        /// Gets a value indicating whether a train is currently detected.
+        /// </summary>
+        public bool IsDetected { get; internal set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether detection is currently enabled.
+        /// </summary>
+        public bool Detect { get; set; }
+
+        /// <summary>
+        /// Starts the detector thread.
+        /// </summary>
+        public void Start()
+        {
+            if (_running)
+            {
+                return;
+            }
+
+            _running = true;
             _thread = new Thread(() =>
             {
-                while (_thread.IsAlive)
+                while (_running)
                 {
                     Value = _channel.ReadValue();
                     if (Detect)
@@ -90,30 +114,21 @@ namespace LegoElement.Models
         }
 
         /// <summary>
-        /// Gets a value indicating whether a train is currently detected.
-        /// </summary>
-        public bool IsDetected { get; internal set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether detection is currently enabled.
-        /// </summary>
-        public bool Detect { get; set; }
-
-        /// <summary>
-        /// Starts the detector thread.
-        /// </summary>
-        public void Start()
-        {
-            _thread.Start();
-        }
-
-        /// <summary>
         /// Stops the detector thread.
         /// </summary>
         public void Stop()
         {
-            _thread.Abort();
-            _thread.Join(100);
+            if (!_running)
+            {
+                return;
+            }
+
+            _running = false;
+            if (_thread != null)
+            {
+                _thread.Join();
+                _thread = null;
+            }
         }
 
         /// <summary>
@@ -136,10 +151,11 @@ namespace LegoElement.Models
         /// </summary>
         public void Dispose()
         {
-            _thread.Abort();
-            _thread.Join(100);
-            _thread = null;
-            _channel.Dispose();
+            Stop();
+            if (_channel != null)
+            {
+                _channel.Dispose();
+            }
         }
     }
 }

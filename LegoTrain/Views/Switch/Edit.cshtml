@@ -21,7 +21,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.Rotation, new { @class = "control-label" })
                 @Html.EditorFor(model => model.Rotation, new { @class = "form-control" })
-                <input type="range" id="rotationSlider" min="0" max="360" value="@Model.Rotation" class="form-range mt-2" />
+                <input type="range" id="rotationSlider" min="-360" max="360" value="@Model.Rotation" class="form-range mt-2" />
             </div>
             <div class="form-group">
                 @Html.LabelFor(model => model.IsLeft, new { @class = "control-label" })
