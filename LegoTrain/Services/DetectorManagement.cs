@@ -38,6 +38,7 @@ namespace LegoTrain.Services
             if (device.DeviceCapacity.HasFlag(DeviceCapability.Detector) || device.DeviceCapacity.HasFlag(DeviceCapability.DoubleDetector))
             {
                 List<CancellationTokenSource> toCancel = new List<CancellationTokenSource>();
+                List<Detector> toRemove = new List<Detector>();
 
                 lock (_devicesLock)
                 {
@@ -46,8 +47,13 @@ namespace LegoTrain.Services
                         if (pair.Key.Id == device.Id)
                         {
                             toCancel.Add(pair.Value);
-                            _devices.Remove(pair.Key);
+                            toRemove.Add(pair.Key);
                         }
+                    }
+
+                    foreach (var detector in toRemove)
+                    {
+                        _devices.Remove(detector);
                     }
                 }
 
@@ -205,6 +211,7 @@ namespace LegoTrain.Services
         public void Stop(DeviceDetails device)
         {
             List<CancellationTokenSource> toCancel = new List<CancellationTokenSource>();
+            List<Detector> toRemove = new List<Detector>();
 
             lock (_devicesLock)
             {
@@ -213,8 +220,13 @@ namespace LegoTrain.Services
                     if (pair.Key.Id == device.Id)
                     {
                         toCancel.Add(pair.Value);
-                        _devices.Remove(pair.Key);
+                        toRemove.Add(pair.Key);
                     }
+                }
+
+                foreach (var detector in toRemove)
+                {
+                    _devices.Remove(detector);
                 }
             }
 
