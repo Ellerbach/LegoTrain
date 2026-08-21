@@ -58,7 +58,7 @@ docker run -d \
   --restart unless-stopped \
   --network host \
   -v $(pwd)/LegoTrain/config:/app/config \
-  ghcr.io/ellerbach/legotrain:arm32-1.0
+  ghcr.io/ellerbach/legotrain:arm32-publish-1.0
 ```
 
 ## Building and pushing the containers
