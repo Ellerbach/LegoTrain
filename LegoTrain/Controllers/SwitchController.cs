@@ -9,15 +9,26 @@ using LegoTrain.Models.Device;
 
 namespace LegoTrain.Controllers
 {
+    /// <summary>
+    /// Controller for managing track switch devices on the Lego train circuit.
+    /// </summary>
     public class SwitchController : Controller
     {
         private readonly AppConfiguration _configuration;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SwitchController"/> class.
+        /// </summary>
+        /// <param name="configuration">The application configuration.</param>
         public SwitchController(AppConfiguration configuration)
         {
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Displays a list of all configured switches with their connection status.
+        /// </summary>
+        /// <returns>The index view with the list of switches.</returns>
         // GET: SwitchController
         public ActionResult Index()
         {
@@ -40,6 +51,11 @@ namespace LegoTrain.Controllers
             return View(_configuration.Switches);
         }
 
+        /// <summary>
+        /// Displays detailed information about a specific switch.
+        /// </summary>
+        /// <param name="id">The switch identifier.</param>
+        /// <returns>The details view for the switch, or NotFound if the switch doesn't exist.</returns>
         // GET: SwitchController/Details/5
         public ActionResult Details(int id)
         {
@@ -65,6 +81,11 @@ namespace LegoTrain.Controllers
             return View(swt);
         }
 
+        /// <summary>
+        /// Displays the form for creating a new switch.
+        /// </summary>
+        /// <param name="id">The switch identifier.</param>
+        /// <returns>The create view with a new switch.</returns>
         // GET: SwitchController/Create
         public ActionResult Create(int id)
         {
@@ -72,6 +93,11 @@ namespace LegoTrain.Controllers
             return View(swt);
         }
 
+        /// <summary>
+        /// Processes the creation of a new switch.
+        /// </summary>
+        /// <param name="collection">The switch data to create.</param>
+        /// <returns>Redirects to Index on success, or returns the view with validation errors.</returns>
         // POST: SwitchController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -100,6 +126,11 @@ namespace LegoTrain.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Displays the form for editing an existing switch.
+        /// </summary>
+        /// <param name="id">The switch identifier.</param>
+        /// <returns>The edit view for the switch, or NotFound if the switch doesn't exist.</returns>
         // GET: SwitchController/Edit/5
         public ActionResult Edit(int id)
         {
@@ -112,6 +143,12 @@ namespace LegoTrain.Controllers
             return View(swt);
         }
 
+        /// <summary>
+        /// Processes the editing of an existing switch.
+        /// </summary>
+        /// <param name="id">The switch identifier.</param>
+        /// <param name="collection">The updated switch data.</param>
+        /// <returns>Redirects to Index on success, or returns the view with validation errors.</returns>
         // POST: SwitchController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -137,6 +174,11 @@ namespace LegoTrain.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Displays the confirmation page for deleting a switch.
+        /// </summary>
+        /// <param name="id">The switch identifier.</param>
+        /// <returns>The delete view for the switch, or NotFound if the switch doesn't exist.</returns>
         // GET: SwitchController/Delete/5
         public ActionResult Delete(int id)
         {
@@ -149,6 +191,11 @@ namespace LegoTrain.Controllers
             return View(swt);
         }
 
+        /// <summary>
+        /// Processes the deletion of a switch.
+        /// </summary>
+        /// <param name="id">The switch identifier.</param>
+        /// <returns>Redirects to Index on success, or returns the view on error.</returns>
         // POST: SwitchController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]

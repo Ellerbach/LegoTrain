@@ -2,28 +2,123 @@
 
 <h2>Edit a signal</h2>
 
-<form asp-action="Edit">
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            @Html.HiddenFor(model => model.Id)
+            <div class="form-group">
+                @Html.LabelFor(model => model.Name, new { @class = "control-label" })
+                @Html.EditorFor(model => model.Name, new { @class = "form-control" })
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.X, new { @class = "control-label" })
+                @Html.EditorFor(model => model.X, new { @class = "form-control" })
+            </div>
 
-    @Html.HiddenFor(model => model.Id)
-    <div class="form-group">
-        @Html.LabelFor(model => model.Name, new { @class = "control-label" })
-        @Html.EditorFor(model => model.Name, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(model => model.X, new { @class = "control-label" })
-        @Html.EditorFor(model => model.X, new { @class = "form-control" })
-    </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.Y, new { @class = "control-label" })
+                @Html.EditorFor(model => model.Y, new { @class = "form-control" })
+            </div>
 
-    <div class="form-group">
-        @Html.LabelFor(model => model.Y, new { @class = "control-label" })
-        @Html.EditorFor(model => model.Y, new { @class = "form-control" })
-    </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
 
-    <div class="form-group">
-        <input type="submit" value="Save" class="btn btn-primary" />
+        <div>
+            <a asp-action="Index">Back to List</a>
+        </div>
     </div>
-</form>
-
-<div>
-    <a asp-action="Index">Back to List</a>
+    <div class="col-md-8">
+        <div style="position: relative; display: inline-block;">
+            <img id="circuitMap" src="/config/circuit.png" alt="Circuit Map" style="max-width: 100%; border: 1px solid #ccc;" />
+            <img id="signalIcon" src="/config/signal-red.png" alt="Signal" style="position: absolute; cursor: move;" />
+        </div>
+        <div class="mt-2">
+            <small class="text-muted">Drag the signal icon to position it on the map. Coordinates will update automatically.</small>
+        </div>
+    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let isDragging = false;
+        const signalIcon = document.getElementById('signalIcon');
+        const circuitMap = document.getElementById('circuitMap');
+        const xInput = document.getElementById('X');
+        const yInput = document.getElementById('Y');
+
+        // Debug: Check if elements are found
+        console.log('Elements found:', {
+            signalIcon: !!signalIcon,
+            circuitMap: !!circuitMap,
+            xInput: !!xInput,
+            yInput: !!yInput
+        });
+
+        if (!signalIcon || !circuitMap || !xInput || !yInput) {
+            console.error('Some required elements were not found');
+            return;
+        }
+
+        function updatePosition() {
+            const x = parseInt(xInput.value) || 0;
+            const y = parseInt(yInput.value) || 0;
+            
+            // Scale coordinates to displayed size
+            const scale = circuitMap.clientWidth / circuitMap.naturalWidth;
+            const displayX = x * scale;
+            const displayY = y * scale;
+            
+            signalIcon.style.left = displayX + 'px';
+            signalIcon.style.top = displayY + 'px';
+            
+            // Scale icon size to match map scale
+            const iconWidth = signalIcon.naturalWidth * scale;
+            const iconHeight = signalIcon.naturalHeight * scale;
+            signalIcon.style.width = iconWidth + 'px';
+            signalIcon.style.height = iconHeight + 'px';
+        }
+
+        signalIcon.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const rect = circuitMap.getBoundingClientRect();
+            const x = e.clientX - rect.left - (signalIcon.width / 2);
+            const y = e.clientY - rect.top - (signalIcon.height / 2);
+            
+            const clampedX = Math.max(0, Math.min(x, rect.width - signalIcon.width));
+            const clampedY = Math.max(0, Math.min(y, rect.height - signalIcon.height));
+            
+            // Convert displayed coordinates to natural image coordinates
+            const scale = circuitMap.clientWidth / circuitMap.naturalWidth;
+            const naturalX = Math.round(clampedX / scale);
+            const naturalY = Math.round(clampedY / scale);
+            
+            xInput.value = naturalX;
+            yInput.value = naturalY;
+            updatePosition();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        xInput.addEventListener('input', updatePosition);
+        yInput.addEventListener('input', updatePosition);
+
+        // Initialize position after image loads
+        if (signalIcon.complete && signalIcon.naturalWidth > 0) {
+            updatePosition();
+        } else {
+            signalIcon.addEventListener('load', updatePosition);
+        }
+        
+        circuitMap.addEventListener('load', updatePosition);
+    });
+</script>

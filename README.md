@@ -42,7 +42,26 @@ You have a default circuit file that you can edit. A PowerPoint can be used to q
 
 ## Running the project
 
-To be done later. This section will include how to package the project and run it on a Raspberry PI or equivalent. Also how to run it on Docker and the necessary settings.
+You need to setup docker on your machine and install Docker or Podman.
+
+You also need to ensure you have gpiod installed: `sudo apt-get install gpiod`
+
+```bash
+docker run -d \
+  --name legotrain \
+  --restart unless-stopped \
+  --network host \
+  -v $(pwd)/LegoTrain/config:/app/config \
+  ellerbach/legotrain:arm32-1.0
+```
+
+## Building and pushing the containers
+
+You can use the `build_docker` files either on Windows with Powershell if you have Docker desktop installed either the Bash one on WSL or any Linux/Mac environement with Docker/Podman installed.
+
+You can specify the platform you want to build, the tag for the image and the version and even if you want to push the image to your prefered registry 😊.
+
+For convenience a version for arm64, arm32 and amd64 is pushed on `doker.io/ellerbach/legotrain`. The image tag follow the format: platfrom-verion.minor. For example `arm32-1.0`
 
 ## Using the API
 

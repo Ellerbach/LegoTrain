@@ -7,6 +7,9 @@ using System.Threading;
 
 namespace SharedServices.Services
 {
+    /// <summary>
+    /// Provides LED blinking functionality for visual status indication on nanoFramework devices.
+    /// </summary>
     public class Blinky : IDisposable
     {
         private readonly GpioController _gpio;
@@ -14,6 +17,10 @@ namespace SharedServices.Services
         private CancellationTokenSource _csToken;
         private Thread _thread;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Blinky"/> class.
+        /// </summary>
+        /// <param name="ledPin">The GPIO pin number for the LED.</param>
         public Blinky(int ledPin)
         {
             if (ledPin >= 0)
@@ -23,10 +30,19 @@ namespace SharedServices.Services
             }
         }
 
+        /// <summary>
+        /// Starts blinking the LED at normal speed (1 second interval).
+        /// </summary>
         public void BlinkNormal() => Blink(1000);
 
+        /// <summary>
+        /// Starts blinking the LED at fast speed (100ms interval) to indicate waiting for WiFi connection.
+        /// </summary>
         public void BlinkWaiWifi() => Blink(100);
 
+        /// <summary>
+        /// Releases all resources used by the Blinky instance.
+        /// </summary>
         public void Dispose()
         {
             ResetToken();

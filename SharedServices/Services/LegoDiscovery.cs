@@ -2,7 +2,6 @@
 // Laurent Ellerbach licenses this file to you under the MIT license.
 
 using System.Net;
-using System.Text;
 using System;
 using System.Threading;
 using System.Net.Sockets;
@@ -12,6 +11,9 @@ using nanoDiscovery.Common;
 
 namespace SharedServices.Services
 {
+    /// <summary>
+    /// Manages device discovery for nanoFramework devices on the Lego train network.
+    /// </summary>
     public class LegoDiscovery : IDisposable
     {
         private const int BindingPort = 2024;
@@ -22,6 +24,17 @@ namespace SharedServices.Services
         private CancellationTokenSource _tokenSource;
         private Thread _runner;
 
+        /// <summary>
+        /// Gets the IP address of the server which sent a discovery request.
+        /// </summary>
+        public IPAddress ServerAddress { get; internal set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LegoDiscovery"/> class.
+        /// </summary>
+        /// <param name="ipaddess">The IP address of this device.</param>
+        /// <param name="deviceId">The unique identifier for this device.</param>
+        /// <param name="capabilities">The capabilities of this device.</param>
         public LegoDiscovery(IPAddress ipaddess, int deviceId, DeviceCapability capabilities)
         {
             _udpClient = new UdpClient();
@@ -34,6 +47,9 @@ namespace SharedServices.Services
             _udpClient.Client.Bind(new IPEndPoint(IPAddress.Any, BindingPort));
         }
 
+        /// <summary>
+        /// Releases all resources used by the discovery service.
+        /// </summary>
         public void Dispose()
         {
             SendByeBye();
@@ -48,6 +64,10 @@ namespace SharedServices.Services
             _udpClient?.Dispose();
         }
 
+        /// <summary>
+        /// Starts listening for discovery messages.
+        /// </summary>
+        /// <param name="token">The cancellation token for stopping the service.</param>
         public void Run(CancellationToken token)
         {
             IsRunning = true;
@@ -69,6 +89,7 @@ namespace SharedServices.Services
                             Console.WriteLine($"MSG: {BitConverter.ToString(recvBuffer)}, decode: {res}, type: {messageType}");
                             if (res && messageType == DiscoveryMessageType.Discovery)
                             {
+                                ServerAddress = ((IPEndPoint)from).Address;
                                 SendCapabilities(((IPEndPoint)from).Address);
                             }
                         }
@@ -87,10 +108,20 @@ namespace SharedServices.Services
             _runner.Start();
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the discovery service is currently running.
+        /// </summary>
         public bool IsRunning { get; private set; }
 
+        /// <summary>
+        /// Stops the discovery service.
+        /// </summary>
         public void Stop() => _tokenSource?.Cancel();
 
+        /// <summary>
+        /// Sends a capabilities message to the specified IP address.
+        /// </summary>
+        /// <param name="ip">The IP address to send the capabilities to.</param>
         public void SendCapabilities(IPAddress ip)
         {
             try
@@ -106,6 +137,9 @@ namespace SharedServices.Services
             }
         }
 
+        /// <summary>
+        /// Sends a goodbye message to notify the network that this device is leaving.
+        /// </summary>
         public void SendByeBye()
         {
             try

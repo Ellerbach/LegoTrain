@@ -5,9 +5,18 @@ using System.Net;
 
 namespace nanoDiscovery
 {
+    /// <summary>
+    /// Provides methods for creating and decoding discovery protocol messages.
+    /// </summary>
     public class DiscoveryMessage
     {
+        /// <summary>
+        /// The header bytes identifying a discovery message ("nDC").
+        /// </summary>
         public static readonly byte[] Header = new byte[] { (byte)'n', (byte)'D', (byte)'C' };
+        /// <summary>
+        /// The protocol version number.
+        /// </summary>
         public const int Version = 1;
 
         /// <summary>
@@ -69,7 +78,7 @@ namespace nanoDiscovery
             messageType = DiscoveryMessageType.None;
             id = -1;
             ipAddress = IPAddress.Any;
-            payload = null;
+            payload = null!;
             // Message looks like in bytes: n D C Version MessageType ID IP1 IP2 IP3 IP4 payload_bytes
             int inc = 0;
             // Check we have a minimum size of 5

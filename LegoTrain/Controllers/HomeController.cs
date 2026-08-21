@@ -10,17 +10,29 @@ using LegoTrain.Models.Device;
 
 namespace LegoTrain.Controllers
 {
+    /// <summary>
+    /// Controller for the home page and main navigation.
+    /// </summary>
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly AppConfiguration _configuration;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HomeController"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
+        /// <param name="configuration">The application configuration.</param>
         public HomeController(ILogger<HomeController> logger, AppConfiguration configuration)
         {
             _logger = logger;
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Displays the home page with an overview of all switches, signals, and infrared devices.
+        /// </summary>
+        /// <returns>The home page view.</returns>
         public IActionResult Index()
         {
             foreach (var device in _configuration.Switches)
@@ -71,11 +83,19 @@ namespace LegoTrain.Controllers
             return View(_configuration);
         }
 
+        /// <summary>
+        /// Displays the privacy policy page.
+        /// </summary>
+        /// <returns>The privacy policy view.</returns>
         public IActionResult Privacy()
         {
             return View();
         }
 
+        /// <summary>
+        /// Displays the error page.
+        /// </summary>
+        /// <returns>The error view.</returns>
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

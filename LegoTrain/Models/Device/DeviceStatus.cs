@@ -3,10 +3,22 @@
 
 namespace LegoTrain.Models.Device
 {
+    /// <summary>
+    /// Represents the connection status of a device.
+    /// </summary>
     public enum DeviceStatus
     {
+        /// <summary>
+        /// Device is joining the network.
+        /// </summary>
         Joining,
+        /// <summary>
+        /// Device is leaving the network.
+        /// </summary>
         Laaving,
+        /// <summary>
+        /// Device is absent from the network.
+        /// </summary>
         Absent,
     }
 }

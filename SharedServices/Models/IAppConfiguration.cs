@@ -3,8 +3,14 @@
 
 namespace SharedServices.Models
 {
+    /// <summary>
+    /// Interface for application configuration that can be persisted.
+    /// </summary>
     public interface IAppConfiguration
     {
+        /// <summary>
+        /// Saves the current configuration.
+        /// </summary>
         public void Save();
     }
 }

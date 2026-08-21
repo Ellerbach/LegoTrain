@@ -12,7 +12,6 @@ using System.Net;
 using System.Threading;
 using SharedServices.Controllers;
 using SharedServices.Services;
-using SignalSwitch;
 using nanoDiscovery.Common;
 
 namespace LegoElement
@@ -31,7 +30,8 @@ namespace LegoElement
         private static CancellationTokenSource _legoDiscoToken;
         private static bool _wifiApMode = false;
         private static Blinky _blinky;
-        private  static int _tries = 0;
+        private static int _tries = 0;
+        private static Timer _timerWiatingWifiSetup;
 
         public static void Main()
         {
@@ -69,6 +69,12 @@ namespace LegoElement
             else
             {
                 _blinky.BlinkWaiWifi();
+                if (Wireless80211.IsEnabled())
+                {
+                    // This will reboot the device every 5 minutes as we seem to have a valid configuration
+                    // It will then try to reconnect
+                    _timerWiatingWifiSetup = new Timer(TimerCallBackReboot, null, 5 * 60 * 1000, 0);
+                }
             }
 
             Debug.WriteLine($"Connected with wifi credentials. IP Address: {(_wifiApMode ? WirelessAP.GetIP() : Wireless80211.GetCurrentIPAddress())}");
@@ -83,6 +89,13 @@ namespace LegoElement
             AppConfiguration.OnConfigurationUpdated += OnConfigurationUpdated;
 
             Thread.Sleep(Timeout.Infinite);
+        }
+
+        private static void TimerCallBackReboot(object state)
+        {
+            // We will basically try to reconnect after 1h
+            Sleep.EnableWakeupByTimer(new TimeSpan(0, 0, 0, 1));
+            Sleep.StartDeepSleep();
         }
 
         private static void WebServerStatusChanged(object obj, WebServerStatusEventArgs e)
@@ -113,7 +126,7 @@ namespace LegoElement
             {
                 SetSwitch();
             }
-            
+
             if (e.ParamName.StartsWith("Device") || e.ParamName.EndsWith("Activated"))
             {
                 SetDiscovery();
@@ -197,21 +210,16 @@ namespace LegoElement
 
         private static void ServerCommandReceived(object obj, WebServerEventArgs e)
         {
-            // Not enough memory to handle those!
             if (e.Context.Request.RawUrl.StartsWith("/style.css"))
             {
-                e.Context.Response.ContentType = "text/css";
-                WebServer.OutPutStream(e.Context.Response, ResourceWeb.GetString(ResourceWeb.StringResources.style));
+                WebServer.SendFileOverHTTP(e.Context.Response, "I:\\Resources\\style.css", "text/css");
                 return;
             }
-            //else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
-            //{
-            //    var ico = ResourceWeb.GetBytes(ResourceWeb.BinaryResources.favicon);
-            //    e.Context.Response.ContentType = "image/ico";
-            //    e.Context.Response.ContentLength64 = ico.Length;
-            //    e.Context.Response.OutputStream.Write(ico, 0, ico.Length);
-            //    return;
-            //}
+            else if (e.Context.Request.RawUrl.StartsWith("/favicon.ico"))
+            {
+                WebServer.SendFileOverHTTP(e.Context.Response, "I:\\Resources\\favicon.ico", "image/ico");
+                return;
+            }
 
             if (_wifiApMode)
             {
@@ -236,14 +244,14 @@ namespace LegoElement
                 }
                 else
                 {
-                    toOutput += $"Your device is properly set as {(AppConfiguration.SignalActivated && AppConfiguration.SwitchActivated ? "both Signal and Switch.": (AppConfiguration.SignalActivated ? "signal." : "swith"))}<br/>";
+                    toOutput += $"Your device is properly set as {(AppConfiguration.SignalActivated && AppConfiguration.SwitchActivated ? "both Signal and Switch." : (AppConfiguration.SignalActivated ? "signal." : "swith"))}<br/>";
                     toOutput += $"Your device ID is {(AppConfiguration.DeviceId < 0 ? "invalid, it must be more or equal to 1." : AppConfiguration.DeviceId)}.<br>";
                 }
 
                 toOutput += "To configure your device please go to <a href=\"/config\">configuration</a>.<br/>";
                 toOutput += "Reset your wifi by cliking <a href=\"/resetwifi\">here</a>.<br>";
                 toOutput += "</body></html>";
-                WebServer.OutPutStream(e.Context.Response, toOutput);
+                WebServer.OutputAsStream(e.Context.Response, toOutput);
                 return;
             }
         }
