@@ -1,0 +1,82 @@
+name: Labels
+
+on:
+  push:
+    branches:
+      - main
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create labels and label pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const definitions = {
+              LegoTrain: ['LegoTrain/', 'nanoDiscovery/', 'LegoDiscoveryCommon/'],
+              LegoInfrared: ['LegoInfrared/', 'SharedServices/', 'nanoDiscovery/', 'LegoDiscoveryCommon/'],
+              SignalSwitch: ['SignalSwitch/', 'SharedServices/', 'nanoDiscovery/', 'LegoDiscoveryCommon/'],
+              TrainDetect: ['TrainDetect/', 'SharedServices/', 'nanoDiscovery/', 'LegoDiscoveryCommon/'],
+              DiscoveryMessageTests: ['DiscoveryMessageTests/', 'nanoDiscovery/'],
+              documentation: ['README.md', 'Lego_api_doc.md', 'LICENSE'],
+              cicd: ['.github/', 'build-docker.ps1', 'build-docker.sh'],
+            };
+            const colors = {
+              LegoTrain: '1f6feb',
+              LegoInfrared: 'd73a4a',
+              SignalSwitch: 'fbca04',
+              TrainDetect: '0e8a16',
+              DiscoveryMessageTests: '5319e7',
+              documentation: '0075ca',
+              cicd: '6f42c1',
+              'dependency update': '0366d6',
+            };
+
+            for (const [name, color] of Object.entries(colors)) {
+              try {
+                await github.rest.issues.getLabel({ ...context.repo, name });
+              } catch (error) {
+                if (error.status !== 404) throw error;
+                await github.rest.issues.createLabel({ ...context.repo, name, color });
+              }
+            }
+
+            if (!context.payload.pull_request) return;
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              ...context.repo,
+              pull_number: context.issue.number,
+              per_page: 100,
+            });
+            const paths = files.map(file => file.filename);
+            const labels = Object.entries(definitions)
+              .filter(([, prefixes]) => prefixes.some(prefix =>
+                paths.some(path => prefix.endsWith('/') ? path.startsWith(prefix) : path === prefix)))
+              .map(([name]) => name);
+
+            const dependencyFiles = paths.some(path =>
+              /(^|\/)(packages\.config|dependabot\.yml)$/.test(path) ||
+              /\.(csproj|nfproj)$/.test(path));
+            if (context.payload.pull_request.user.login === 'dependabot[bot]' || dependencyFiles) {
+              labels.push('dependency update');
+            }
+
+            if (labels.length > 0) {
+              await github.rest.issues.addLabels({
+                ...context.repo,
+                issue_number: context.issue.number,
+                labels,
+              });
+            }
