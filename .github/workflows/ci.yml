@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  dotnet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - name: Test discovery messages
+        run: dotnet test DiscoveryMessageTests/DiscoveryMessageTests.csproj --configuration Release
+      - name: Build LegoTrain
+        run: dotnet build LegoTrain/LegoTrain.csproj --configuration Release
+
+  firmware:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: NuGet/setup-nuget@v2
+      - uses: nanoframework/nanobuild@v1
+        with:
+          gitHubAuth: ${{ github.token }}
+      - name: Restore nanoFramework packages
+        run: nuget restore LegoTrain.sln -NonInteractive
+      - name: Build nanoFramework projects
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
+          if (-not $msbuild) { throw 'MSBuild was not found.' }
+          $projects = 'LegoInfrared', 'SignalSwitch', 'TrainDetect'
+          foreach ($project in $projects) {
+            & $msbuild "$project/$project.nfproj" /t:Rebuild /p:Configuration=Release /p:Platform=AnyCPU /m
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+
+  docker:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: amd64
+            platform: linux/amd64
+            dockerfile: LegoTrain/Dockerfile
+          - architecture: arm32
+            platform: linux/arm/v7
+            dockerfile: LegoTrain/Dockerfile.arm32
+          - architecture: arm64
+            platform: linux/arm64
+            dockerfile: LegoTrain/Dockerfile.arm64
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build ${{ matrix.architecture }} Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          platforms: ${{ matrix.platform }}
+          push: false

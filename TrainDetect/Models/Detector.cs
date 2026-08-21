@@ -18,7 +18,7 @@ namespace LegoElement.Models
         private AdcController _controller = new AdcController();
         private AdcChannel _channel;
         private Thread _thread;
-        private volatile bool _running;
+        private bool _running;
 
         /// <summary>
         /// Delegate for detector events.

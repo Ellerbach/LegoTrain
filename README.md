@@ -2,6 +2,12 @@
 
 IR Lego Power Function for train, switch control with servo motor, light signal using remote wifi controlled MCU based on [ESP32-C3 super mini](https://www.bing.com/search?q=esp32-c3+super+mini&qs=n&form=QBRE&sp=-1&lq=0&pq=esp32-c3+super+mini&sc=9-19&sk=&cvid=465952776C5548268A0AC7C84DE5E692&ghsh=0&ghacc=0&ghpl=) running [.NET nanoFramework](https://www.nanoframework.net)!
 
+## Releases
+
+Push the `publish` tag, or a tag prefixed with `publish-`, to create a GitHub Release. Publishing a GitHub Release manually also starts the publishing workflow.
+
+Each release contains the `LegoInfrared.bin`, `SignalSwitch.bin`, and `TrainDetect.bin` firmware files. Docker images for `amd64`, `arm32`, and `arm64` are published to `ghcr.io/<owner>/<repository>` with tags in the form `<architecture>-<release-tag>`.
+
 One LegoInfrared module allows to control any Lego Power Function and support all Lego modes including exclusive modes which can't be done thru any of the Lego remote control through API. Please refer to the [LegoInfrared project](https://github.com/Ellerbach/LegoInfrared) for more details. In our case, this module will control trains.
 
 Specific module allow to control servo motors used to pilot Lego switches and to pilot red/green signal lights.
@@ -52,16 +58,45 @@ docker run -d \
   --restart unless-stopped \
   --network host \
   -v $(pwd)/LegoTrain/config:/app/config \
-  ellerbach/legotrain:arm32-1.0
+  ghcr.io/ellerbach/legotrain:arm32-publish-1.0
 ```
 
 ## Building and pushing the containers
 
-You can use the `build_docker` files either on Windows with Powershell if you have Docker desktop installed either the Bash one on WSL or any Linux/Mac environement with Docker/Podman installed.
+The Dockerfiles use `FROM --platform=$BUILDPLATFORM` so the .NET application is compiled on the host architecture while the final image targets the selected architecture. `BUILDPLATFORM` is set automatically by Docker BuildKit; do not set it manually.
 
-You can specify the platform you want to build, the tag for the image and the version and even if you want to push the image to your prefered registry 😊.
+Docker Desktop includes Buildx. On Linux, install the Docker Buildx plugin, then verify that it is available:
 
-For convenience a version for arm64, arm32 and amd64 is pushed on `doker.io/ellerbach/legotrain`. The image tag follow the format: platfrom-verion.minor. For example `arm32-1.0`
+```bash
+docker buildx version
+docker buildx inspect --bootstrap
+```
+
+The helper scripts build one architecture at a time and tag the image as `<architecture>-<version>`:
+
+```powershell
+./build-docker.ps1 -Platform amd64 -Version 1.0
+./build-docker.ps1 -Platform arm64 -Version 1.0
+./build-docker.ps1 -Platform arm32 -Version 1.0
+```
+
+```bash
+./build-docker.sh --platform amd64 --version 1.0
+./build-docker.sh --platform arm64 --version 1.0
+./build-docker.sh --platform arm32 --version 1.0
+```
+
+To build directly with Buildx, use the matching platform and Dockerfile. `--load` imports the single-platform result into the local Docker image store:
+
+```bash
+docker buildx build --load --platform linux/amd64 -f LegoTrain/Dockerfile -t legotrain:amd64-1.0 .
+docker buildx build --load --platform linux/arm64 -f LegoTrain/Dockerfile.arm64 -t legotrain:arm64-1.0 .
+docker buildx build --load --platform linux/arm/v7 -f LegoTrain/Dockerfile.arm32 -t legotrain:arm32-1.0 .
+```
+
+Add `--push` to either helper script to publish to its configured registry. For direct Buildx commands, replace `--load` with `--push` and use a registry-qualified image name.
+
+Release images are available from `ghcr.io/ellerbach/legotrain` for `amd64`, `arm64`, and `arm32`.
 
 ## Using the API
 
