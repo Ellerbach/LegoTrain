@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main
-  pull_request_target:
+  workflow_run:
+    workflows:
+      - CI
     types:
-      - opened
-      - reopened
-      - synchronize
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -53,11 +53,17 @@ jobs:
               }
             }
 
-            if (!context.payload.pull_request) return;
+            const pullRequestNumber = context.payload.workflow_run?.pull_requests?.[0]?.number;
+            if (!pullRequestNumber) return;
+
+            const { data: pullRequest } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: pullRequestNumber,
+            });
 
             const files = await github.paginate(github.rest.pulls.listFiles, {
               ...context.repo,
-              pull_number: context.issue.number,
+              pull_number: pullRequestNumber,
               per_page: 100,
             });
             const paths = files.map(file => file.filename);
@@ -69,14 +75,14 @@ jobs:
             const dependencyFiles = paths.some(path =>
               /(^|\/)(packages\.config|dependabot\.yml)$/.test(path) ||
               /\.(csproj|nfproj)$/.test(path));
-            if (context.payload.pull_request.user.login === 'dependabot[bot]' || dependencyFiles) {
+            if (pullRequest.user.login === 'dependabot[bot]' || dependencyFiles) {
               labels.push('dependency update');
             }
 
             if (labels.length > 0) {
               await github.rest.issues.addLabels({
                 ...context.repo,
-                issue_number: context.issue.number,
+                issue_number: pullRequestNumber,
                 labels,
               });
             }
