@@ -1,7 +1,12 @@
 version: 2
 updates:
   - package-ecosystem: nuget
-    directory: /
+    directories:
+      - /DiscoveryMessageTests
+      - /LegoInfrared
+      - /LegoTrain
+      - /SignalSwitch
+      - /TrainDetect
     schedule:
       interval: weekly
     labels:

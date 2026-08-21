@@ -58,7 +58,7 @@ docker run -d \
   --restart unless-stopped \
   --network host \
   -v $(pwd)/LegoTrain/config:/app/config \
-  ellerbach/legotrain:arm32-1.0
+  ghcr.io/ellerbach/legotrain:arm32-1.0
 ```
 
 ## Building and pushing the containers
@@ -96,7 +96,7 @@ docker buildx build --load --platform linux/arm/v7 -f LegoTrain/Dockerfile.arm32
 
 Add `--push` to either helper script to publish to its configured registry. For direct Buildx commands, replace `--load` with `--push` and use a registry-qualified image name.
 
-Published images are available from `docker.io/ellerbach/legotrain` for `amd64`, `arm64`, and `arm32`.
+Release images are available from `ghcr.io/ellerbach/legotrain` for `amd64`, `arm64`, and `arm32`.
 
 ## Using the API
 
