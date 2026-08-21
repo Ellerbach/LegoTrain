@@ -1,0 +1,60 @@
+'LegoTrain':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LegoTrain/**'
+          - 'nanoDiscovery/**'
+          - 'LegoDiscoveryCommon/**'
+
+'LegoInfrared':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LegoInfrared/**'
+          - 'SharedServices/**'
+          - 'nanoDiscovery/**'
+          - 'LegoDiscoveryCommon/**'
+
+'SignalSwitch':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'SignalSwitch/**'
+          - 'SharedServices/**'
+          - 'nanoDiscovery/**'
+          - 'LegoDiscoveryCommon/**'
+
+'TrainDetect':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'TrainDetect/**'
+          - 'SharedServices/**'
+          - 'nanoDiscovery/**'
+          - 'LegoDiscoveryCommon/**'
+
+'DiscoveryMessageTests':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'DiscoveryMessageTests/**'
+          - 'nanoDiscovery/**'
+
+'documentation':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'README.md'
+          - 'Lego_api_doc.md'
+          - 'LICENSE'
+
+'cicd':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+          - 'build-docker.ps1'
+          - 'build-docker.sh'
+
+'dependency update':
+  - head-branch:
+      - '^dependabot/'
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/packages.config'
+          - '.github/dependabot.yml'
+          - '**/*.csproj'
+          - '**/*.nfproj'
