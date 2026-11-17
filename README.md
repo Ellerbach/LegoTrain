@@ -101,3 +101,5 @@ Release images are available from `ghcr.io/ellerbach/legotrain` for `amd64`, `ar
 ## Using the API
 
 API are available. Documentation in [this file](./Lego_api_doc.md). This does allow to pilot any Lego IR element, more than just trains.
+
+In the Development environment, Swagger UI is available at `/swagger` and the OpenAPI document at `/swagger/v1/swagger.json`. These are provided by Swashbuckle; the separate `Microsoft.AspNetCore.OpenApi` package is not used.
